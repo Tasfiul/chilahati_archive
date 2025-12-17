@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Chilahati Archive</title>
+    <!-- Fonts & Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+
+<body>
+
+    <!-- Include Navbar -->
+    <%- include('partials/navbar') %>
+
+        <div class="auth-container">
+            <div class="auth-card">
+                <h2>Welcome Back</h2>
+                <!-- ERROR MESSAGES (From Passport) -->
+                <% if (error && error.length> 0) { %>
+                    <div
+                        style="background: rgba(255, 107, 107, 0.2); border: 1px solid #ff6b6b; color: #ff6b6b; padding: 10px; border-radius: 8px; margin-bottom: 15px; text-align: center;">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <%= error %>
+                    </div>
+                    <% } %>
+                
+                        <!-- SUCCESS MESSAGES -->
+                        <% if (success_msg && success_msg.length> 0) { %>
+                            <div
+                                style="background: rgba(46, 204, 113, 0.2); border: 1px solid #2ecc71; color: #2ecc71; padding: 10px; border-radius: 8px; margin-bottom: 15px; text-align: center;">
+                                <i class="fas fa-check-circle"></i>
+                                <%= success_msg %>
+                            </div>
+                            <% } %>
+                <!-- The Form -->
+                <form action="/login" method="POST">
+
+                    <div class="form-group">
+                        <label for="email">Email Address</label>
+                        <input type="email" id="email" name="email" class="form-control" placeholder="Enter your email"
+                            required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <input type="password" id="password" name="password" class="form-control"
+                            placeholder="Enter your password" required>
+                    </div>
+
+                    <button type="submit" class="btn-block">Login</button>
+                </form>
+
+                <div class="auth-footer">
+                    Don't have an account?
+                    <a href="/register" class="auth-link">Register here</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Include Footer -->
+        <%- include('partials/footer') %>
+
+            <script>
+                const themeToggleBtn = document.getElementById('theme-toggle');
+                const body = document.body;
+                const icon = themeToggleBtn.querySelector('i');
+                themeToggleBtn.addEventListener('click', () => {
+                    body.classList.toggle('dark-mode');
+                    if (body.classList.contains('dark-mode')) {
+                        icon.classList.remove('fa-moon');
+                        icon.classList.add('fa-sun');
+                    } else {
+                        icon.classList.remove('fa-sun');
+                        icon.classList.add('fa-moon');
+                    }
+                });
+            </script>
+</body>
+
+</html>

@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chilahati - Discover the Beauty</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- OUR CUSTOM CSS -->
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+
+<body>
+
+    <!-- INCLUDE NAVBAR -->
+    <%- include('partials/navbar') %>
+
+        <div class="main-content">
+            <header>
+                <h1>Chilahati</h1>
+                <p class="subtitle">Gateway to the North &bull; Nilphamari</p>
+            </header>
+            <div class="menu-grid">
+                <a href="#" class="card card-history">
+                    <div class="card-content">
+                        <div class="card-icon"><i class="fas fa-history"></i></div>
+                        <h3>History</h3>
+                        <p>Explore the rich heritage and past.</p>
+                    </div>
+                    <i class="fas fa-arrow-right card-arrow"></i>
+                </a>
+                <a href="#" class="card card-culture">
+                    <div class="card-content">
+                        <div class="card-icon"><i class="fas fa-palette"></i></div>
+                        <h3>Culture</h3>
+                        <p>Art, traditions, and festivals.</p>
+                    </div>
+                    <i class="fas fa-arrow-right card-arrow"></i>
+                </a>
+                <a href="#" class="card card-institution">
+                    <div class="card-content">
+                        <div class="card-icon"><i class="fas fa-university"></i></div>
+                        <h3>Institutions</h3>
+                        <p>Governments, educations and more.</p>
+                    </div>
+                    <i class="fas fa-arrow-right card-arrow"></i>
+                </a>
+                <a href="#" class="card card-people">
+                    <div class="card-content">
+                        <div class="card-icon"><i class="fas fa-users"></i></div>
+                        <h3>Notable People</h3>
+                        <p>Legends who shaped our land.</p>
+                    </div>
+                    <i class="fas fa-arrow-right card-arrow"></i>
+                </a>
+                <a href="#" class="card card-Local_Scholars">
+                    <div class="card-content">
+                        <div class="card-icon"><i class="fas fa-graduation-cap"></i></div>
+                        <h3>Local Scholars</h3>
+                        <p>University achievers and more.</p>
+                    </div>
+                    <i class="fas fa-arrow-right card-arrow"></i>
+                </a>
+                <a href="#" class="card card-transport">
+                    <div class="card-content">
+                        <div class="card-icon"><i class="fas fa-train"></i></div>
+                        <h3>Transport</h3>
+                        <p>Transportations connecting Chilahati.</p>
+                    </div>
+                    <i class="fas fa-arrow-right card-arrow"></i>
+                </a>
+                <a href="#" class="card card-tourist">
+                    <div class="card-content">
+                        <div class="card-icon"><i class="fas fa-camera-retro"></i></div>
+                        <h3>Tourist Spots</h3>
+                        <p>Beautiful places to visit.</p>
+                    </div>
+                    <i class="fas fa-arrow-right card-arrow"></i>
+                </a>
+                <a href="#" class="card card-emergency">
+                    <div class="card-content">
+                        <div class="card-icon"><i class="fas fa-ambulance"></i></div>
+                        <h3>Emergency</h3>
+                        <p>Hospitals, Police, and Fire.</p>
+                    </div>
+                    <i class="fas fa-arrow-right card-arrow"></i>
+                </a>
+                <a href="#" class="card card-social">
+                    <div class="card-content">
+                        <div class="card-icon"><i class="fas fa-hands-helping"></i></div>
+                        <h3>Social Work</h3>
+                        <p>Foundations and NGOs.</p>
+                    </div>
+                    <i class="fas fa-arrow-right card-arrow"></i>
+                </a>
+                <a href="#" class="card card-map">
+                    <div class="card-content">
+                        <div class="card-icon"><i class="fas fa-map-marked-alt"></i></div>
+                        <h3>Interactive Map</h3>
+                        <p>Navigate the area visually.</p>
+                    </div>
+                    <i class="fas fa-arrow-right card-arrow"></i>
+                </a>
+            </div>
+        </div>
+
+        <!-- INCLUDE FOOTER -->
+        <%- include('partials/footer') %>
+
+            <script>
+                const themeToggleBtn = document.getElementById('theme-toggle');
+                const body = document.body;
+                const icon = themeToggleBtn.querySelector('i');
+                themeToggleBtn.addEventListener('click', () => {
+                    body.classList.toggle('dark-mode');
+                    if (body.classList.contains('dark-mode')) {
+                        icon.classList.remove('fa-moon');
+                        icon.classList.add('fa-sun');
+                    } else {
+                        icon.classList.remove('fa-sun');
+                        icon.classList.add('fa-moon');
+                    }
+                });
+            </script>
+</body>
+
+</html>
