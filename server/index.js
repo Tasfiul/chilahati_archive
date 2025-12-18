@@ -5,7 +5,7 @@ const path = require('path');
 const session = require('express-session');
 const flash = require('connect-flash');
 const passport = require('passport');
-
+const adminRoutes = require('./routes/admin'); // NEW
 // Passport Config
 require('./config/passport')(passport);
 
@@ -22,7 +22,14 @@ app.use(express.urlencoded({ extended: true }));
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, '../client/views'));
 app.use(express.static(path.join(__dirname, '../client/public')));
-
+// --- NEW: DISABLE BROWSER CACHING ---
+// This prevents the "Back Button" from showing a logged-in page after logout
+app.use((req, res, next) => {
+    res.set('Cache-Control', 'no-store, no-cache, must-revalidate, private');
+    res.set('Pragma', 'no-cache');
+    res.set('Expires', '0');
+    next();
+});
 // 3. Session Setup
 app.use(session({
     secret: process.env.SESSION_SECRET,
@@ -50,7 +57,7 @@ app.use((req, res, next) => {
 // 7. Routes
 const authRoutes = require('./routes/auth');
 app.use('/', authRoutes);
-
+app.use('/admin', adminRoutes); // NEW: Access these at /admin/add
 app.get('/', (req, res) => {
     res.render('home');
 });

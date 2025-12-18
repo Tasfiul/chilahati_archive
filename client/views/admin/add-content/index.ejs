@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Content - Chilahati Archive</title>
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- QUILL EDITOR (The Rich Text Library) -->
+    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/admin-add.css">
+</head>
+
+<body>
+
+    <%- include('../../partials/navbar') %>
+
+        <div class="admin-container">
+            <h1>Contribute New Entry</h1>
+
+            <!-- Alerts -->
+            <% if (success_msg && success_msg.length> 0) { %>
+                <div style="background: #2ecc71; padding: 10px; border-radius: 5px; margin-bottom: 15px;">
+                    <%= success_msg %>
+                </div>
+                <% } %>
+                    <% if (error_msg && error_msg.length> 0) { %>
+                        <div style="background: #e74c3c; padding: 10px; border-radius: 5px; margin-bottom: 15px;">
+                            <%= error_msg %>
+                        </div>
+                        <% } %>
+
+                            <form action="/admin/add" method="POST" id="mainForm">
+
+                                <!-- 1. GLOBAL FIELDS -->
+                                <div class="form-section">
+                                    <h3>Basic Information</h3>
+                                    <label>Category</label>
+                                    <select name="category" id="categorySelect" required>
+                                        <option value="">-- Select Category --</option>
+                                        <option value="Institution">Institution (School, Govt, Bank)</option>
+                                        <option value="TouristSpot">Tourist Spot</option>
+                                        <option value="Emergency">Emergency Service</option>
+                                        <option value="Transport">Transport</option>
+                                        <option value="SocialWork">Social Work / NGO</option>
+                                        <option value="Person">Notable Person / Scholar</option>
+                                        <option value="Heritage">History / Culture</option>
+                                    </select>
+
+                                    <label>Title (Name of Place/Person)</label>
+                                    <input type="text" name="title" placeholder="e.g. Chilahati Government College"
+                                        required>
+
+                                    <label>Slug (URL Friendly)</label>
+                                    <input type="text" name="slug" placeholder="e.g. chilahati-government-college"
+                                        required>
+
+                                    <label>Thumbnail Image (Google Drive Link)</label>
+                                    <input type="text" name="thumbnail"
+                                        placeholder="Paste Google Drive Share Link here">
+
+                                    <label>Status</label>
+                                    <select name="status">
+                                        <option value="draft">Draft (Save for later)</option>
+                                        <option value="published">Publish Now</option>
+                                    </select>
+                                </div>
+
+                                <!-- 2. DYNAMIC FIELDS (Changes based on Category) -->
+                                <div id="dynamicFields" class="form-section hidden">
+                                    <h3 id="dynamicTitle">Specific Details</h3>
+
+                                    <!-- A. LOCATION BASED FIELDS -->
+                                    <div id="locationGroup" class="hidden">
+                                        <label>Google Maps Link / Coordinates</label>
+                                        <input type="text" name="locationLink"
+                                            placeholder="https://maps.google.com/...">
+                                        <label>Address / Location Description</label>
+                                        <input type="text" name="address" placeholder="e.g. Near Railway Station">
+                                    </div>
+
+                                    <!-- B. INSTITUTION SPECIFIC -->
+                                    <div id="InstitutionFields" class="specific-group hidden">
+                                        <label>Type</label>
+                                        <select name="subType">
+                                            <option value="Educational">Educational</option>
+                                            <option value="Governmental">Governmental</option>
+                                            <option value="Financial">Financial</option>
+                                            <option value="Religious">Religious</option>
+                                        </select>
+                                        <label>Established Date</label>
+                                        <input type="date" name="establishedDate">
+                                        <label>Head of Institution</label>
+                                        <input type="text" name="headOfInstitution">
+                                    </div>
+
+                                    <!-- C. PERSON SPECIFIC -->
+                                    <div id="PersonFields" class="specific-group hidden">
+                                        <label>Person Type</label>
+                                        <select name="personType">
+                                            <option value="Notable">Notable Person</option>
+                                            <option value="Scholar">Local Scholar</option>
+                                        </select>
+                                        <label>Profession / Title</label>
+                                        <input type="text" name="profession">
+                                        <label>Date of Birth</label>
+                                        <input type="date" name="dateOfBirth">
+                                        <label>Date of Death (Leave empty if alive)</label>
+                                        <input type="date" name="dateOfDeath">
+                                    </div>
+
+                                    <!-- D. HERITAGE SPECIFIC -->
+                                    <div id="HeritageFields" class="specific-group hidden">
+                                        <label>Type</label>
+                                        <select name="heritageType">
+                                            <option value="History">History Event</option>
+                                            <option value="Culture">Cultural Tradition</option>
+                                        </select>
+                                        <label>Event Date</label>
+                                        <input type="date" name="eventDate">
+                                    </div>
+                                </div>
+
+                                <!-- 3. RICH CONTENT BODY -->
+                                <div class="form-section">
+                                    <h3>Content Body (Wikipedia Style)</h3>
+                                    <div class="toolbar">
+                                        <button type="button" class="tool-btn" onclick="addBlock('heading')"><i
+                                                class="fas fa-heading"></i> Heading</button>
+                                        <button type="button" class="tool-btn" onclick="addBlock('paragraph')"><i
+                                                class="fas fa-paragraph"></i> Rich Text</button>
+                                        <button type="button" class="tool-btn" onclick="addBlock('image')"><i
+                                                class="fas fa-image"></i> Image</button>
+                                        <button type="button" class="tool-btn" onclick="addBlock('table')"><i
+                                                class="fas fa-table"></i> Table</button>
+                                        <button type="button" class="tool-btn" onclick="addBlock('pdf')"><i 
+                                                class="fas fa-file-pdf"></i> Embed PDF</button>
+                                    </div>
+
+                                    <div id="editorContainer" class="block-editor">
+                                        <p
+                                            style="color: #bbb; font-style: italic; text-align: center; margin-top: 80px;">
+                                            Click a button above to add a section...
+                                        </p>
+                                    </div>
+
+                                    <!-- Hidden input to store JSON -->
+                                    <input type="hidden" name="bodyContentJSON" id="bodyContentJSON">
+                                </div>
+
+                                <button type="submit" class="btn-block" style="background: #2ecc71;">Save Entry</button>
+                            </form>
+        </div>
+
+        <!-- Load Quill JS -->
+        <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
+
+        <script>
+            // --- 1. Dynamic Field Logic (Same as before) ---
+            const categorySelect = document.getElementById('categorySelect');
+            const dynamicFields = document.getElementById('dynamicFields');
+            const locationGroup = document.getElementById('locationGroup');
+
+            categorySelect.addEventListener('change', function () {
+                const cat = this.value;
+                document.querySelectorAll('.specific-group').forEach(el => el.classList.add('hidden'));
+                locationGroup.classList.add('hidden');
+                dynamicFields.classList.add('hidden');
+
+                if (cat) {
+                    dynamicFields.classList.remove('hidden');
+                    if (['Institution', 'TouristSpot', 'Emergency', 'Transport', 'SocialWork'].includes(cat)) {
+                        locationGroup.classList.remove('hidden');
+                    }
+                    const specificDiv = document.getElementById(cat + 'Fields');
+                    if (specificDiv) specificDiv.classList.remove('hidden');
+                }
+            });
+
+            // --- 2. Rich Block Editor Logic ---
+            const editorContainer = document.getElementById('editorContainer');
+            const quillInstances = {}; // Store Quill instances here to access data later
+
+            function addBlock(type) {
+                if (editorContainer.innerText.includes('Click a button above')) editorContainer.innerHTML = '';
+
+                const blockId = Date.now();
+                const blockDiv = document.createElement('div');
+                blockDiv.className = 'block-item';
+                blockDiv.dataset.id = blockId;
+                blockDiv.dataset.type = type;
+
+                let contentHTML = '';
+
+                if (type === 'heading') {
+                    contentHTML = `<strong>Heading:</strong> <input type="text" class="block-input" placeholder="Section Title (e.g., Early Life)">`;
+                }
+                else if (type === 'image') {
+                    contentHTML = `<strong>Image:</strong> <input type="text" class="block-input" placeholder="Paste Google Drive Link"> <input type="text" class="block-caption" placeholder="Caption">`;
+                }
+                else if (type === 'pdf') {
+                    contentHTML = `
+        <strong>Embed PDF Document:</strong> 
+        <input type="text" class="block-input" placeholder="Paste Google Drive Share Link (must be 'Anyone with link')">
+        <input type="text" class="block-caption" placeholder="Document Title (e.g. Annual Report 1971)">
+        <small style="color: #aaa; display:block; margin-top:5px;">* User stays on site, file loads in a frame.</small>
+    `;
+                }
+                else if (type === 'paragraph') {
+                    // Placeholder div for Quill
+                    contentHTML = `<strong>Rich Text:</strong> <div id="quill-editor-${blockId}" style="height: 200px;"></div>`;
+                }
+                else if (type === 'table') {
+                    contentHTML = `
+                <strong>Table Builder:</strong>
+                <div class="table-builder-controls">
+                    <input type="number" id="rows-${blockId}" class="table-input" placeholder="Rows" value="3" min="1">
+                    <input type="number" id="cols-${blockId}" class="table-input" placeholder="Cols" value="2" min="1">
+                    <button type="button" class="tool-btn" onclick="generateTable(${blockId})">Create Grid</button>
+                </div>
+                <div id="table-container-${blockId}"></div>
+            `;
+                }
+
+                blockDiv.innerHTML = `
+            ${contentHTML}
+            <button type="button" class="remove-btn" onclick="removeBlock(${blockId})"><i class="fas fa-times"></i></button>
+        `;
+
+                editorContainer.appendChild(blockDiv);
+
+                // If it's a paragraph, Initialize Quill
+                if (type === 'paragraph') {
+                    const quill = new Quill(`#quill-editor-${blockId}`, {
+                        theme: 'snow',
+                        modules: {
+                            toolbar: [
+                                ['bold', 'italic', 'underline', 'strike'], // toggled buttons
+                                [{ 'align': [] }],
+                                [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+                                [{ 'size': ['small', false, 'large', 'huge'] }],
+                                [{ 'color': [] }, { 'background': [] }],
+                                ['clean'] // remove formatting
+                            ]
+                        }
+                    });
+                    quillInstances[blockId] = quill;
+                }
+            }
+
+            // --- Table Generator Function ---
+            window.generateTable = function (id) {
+                const rows = document.getElementById(`rows-${id}`).value;
+                const cols = document.getElementById(`cols-${id}`).value;
+                const container = document.getElementById(`table-container-${id}`);
+
+                let html = '<table class="generated-table">';
+                for (let i = 0; i < rows; i++) {
+                    html += '<tr>';
+                    for (let j = 0; j < cols; j++) {
+                        // If first row, make it bold placeholder
+                        let placeholder = (i === 0) ? `Header ${j + 1}` : `Data`;
+                        html += `<td><input type="text" placeholder="${placeholder}"></td>`;
+                    }
+                    html += '</tr>';
+                }
+                html += '</table>';
+                container.innerHTML = html;
+            }
+
+            window.removeBlock = function (id) {
+                const el = document.querySelector(`[data-id="${id}"]`);
+                if (el) {
+                    el.remove();
+                    if (quillInstances[id]) delete quillInstances[id];
+                }
+            }
+
+            // --- 3. Save Logic ---
+            document.getElementById('mainForm').addEventListener('submit', function (e) {
+                const blockElements = document.querySelectorAll('.block-item');
+                let dataToSave = [];
+
+                blockElements.forEach((el, index) => {
+                    const type = el.dataset.type;
+                    const id = el.dataset.id;
+                    let content = '';
+
+                    if (type === 'paragraph') {
+                        content = quillInstances[id].root.innerHTML;
+                    }
+                    else if (type === 'image') {
+                        content = {
+                            url: el.querySelector('.block-input').value,
+                            caption: el.querySelector('.block-caption').value
+                        };
+                    }
+                    else if (type === 'pdf') {
+                        const rawLink = el.querySelector('.block-input').value;
+                        const title = el.querySelector('.block-caption').value;
+                        let embedUrl = rawLink;
+                        const driveRegex = /d\/([a-zA-Z0-9_-]+)/;
+                        const match = rawLink.match(driveRegex);
+
+                        if (match && match[1]) {
+                            embedUrl = `https://drive.google.com/file/d/${match[1]}/preview`;
+                        }
+
+                        content = {
+                            url: embedUrl,
+                            title: title
+                        };
+                    }
+                    else if (type === 'table') {
+                        const tableContainer = document.getElementById(`table-container-${id}`);
+                        const inputs = tableContainer.querySelectorAll('input');
+                        const rows = document.getElementById(`rows-${id}`).value;
+                        const cols = document.getElementById(`cols-${id}`).value;
+
+                        let tableHTML = '<table border="1" style="width:100%; border-collapse: collapse;">';
+                        let inputIndex = 0;
+
+                        for (let r = 0; r < rows; r++) {
+                            tableHTML += '<tr>';
+                            for (let c = 0; c < cols; c++) {
+                                let val = inputs[inputIndex].value;
+                                const linkPattern = /\[(.*?)\]\((.*?)\)/g;
+                                if (linkPattern.test(val)) {
+                                    val = val.replace(linkPattern, '<a href="$2" target="_blank" style="color: #667eea; text-decoration: underline;">$1</a>');
+                                }
+                                else if (val.startsWith('http')) {
+                                    val = `<a href="${val}" target="_blank" style="color: #667eea; text-decoration: underline;">View Link</a>`;
+                                }
+
+                                if (r === 0) tableHTML += `<th style="background:#ddd; padding:8px; color:black;">${val}</th>`;
+                                else tableHTML += `<td style="padding:8px; border:1px solid #ddd; color: #333;">${val}</td>`; 
+                                inputIndex++;
+                            }
+                            tableHTML += '</tr>';
+                        }
+                        tableHTML += '</table>';
+                        content = tableHTML;
+                    }
+                    else {
+                        content = el.querySelector('.block-input').value;
+                    }
+
+                    dataToSave.push({
+                        type: type,
+                        content: content,
+                        order: index
+                    });
+                });
+
+                document.getElementById('bodyContentJSON').value = JSON.stringify(dataToSave);
+            });
+        </script>
+
+</body>
+
+</html>

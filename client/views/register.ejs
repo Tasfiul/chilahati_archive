@@ -80,22 +80,7 @@
         <%- include('partials/footer') %>
 
             <script>
-                // 1. Theme Toggle Logic
-                const themeToggleBtn = document.getElementById('theme-toggle');
-                const body = document.body;
-                const icon = themeToggleBtn.querySelector('i');
-                themeToggleBtn.addEventListener('click', () => {
-                    body.classList.toggle('dark-mode');
-                    if (body.classList.contains('dark-mode')) {
-                        icon.classList.remove('fa-moon');
-                        icon.classList.add('fa-sun');
-                    } else {
-                        icon.classList.remove('fa-sun');
-                        icon.classList.add('fa-moon');
-                    }
-                });
-
-                // 2. Client-Side Password Matching Validation
+                // 1. Client-Side Password Matching Validation
                 const form = document.getElementById('registerForm');
                 const password = document.getElementById('password');
                 const confirmPassword = document.getElementById('confirm_password');

@@ -1,0 +1,170 @@
+/* client/public/css/admin-add.css */
+
+.admin-container {
+    padding: 2rem 5%;
+    max-width: 1000px;
+    margin: 0 auto;
+    color: white;
+}
+
+.form-section {
+    background: rgba(255, 255, 255, 0.05);
+    padding: 20px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.hidden {
+    display: none !important;
+    /* Force hide */
+}
+
+/* Form Elements */
+label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: #ccc;
+}
+
+select,
+input,
+textarea {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    background: #222;
+    border: 1px solid #444;
+    color: white;
+    border-radius: 5px;
+}
+
+select:focus,
+input:focus,
+textarea:focus {
+    outline: none;
+    border-color: #667eea;
+}
+
+/* Block Editor Styles */
+.block-editor {
+    border: 1px dashed #666;
+    padding: 10px;
+    min-height: 200px;
+    border-radius: 5px;
+    background: rgba(0, 0, 0, 0.2);
+}
+
+.block-item {
+    background: #333;
+    padding: 15px;
+    margin-bottom: 10px;
+    border-radius: 5px;
+    position: relative;
+    border-left: 3px solid #667eea;
+}
+
+.remove-btn {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    background: #e74c3c;
+    border: none;
+    color: white;
+    cursor: pointer;
+    border-radius: 3px;
+    padding: 2px 8px;
+    font-size: 0.8rem;
+}
+
+.toolbar {
+    margin-bottom: 10px;
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.tool-btn {
+    background: #444;
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: background 0.2s;
+}
+
+.tool-btn:hover {
+    background: #666;
+}
+
+/* Specific Inputs inside Blocks */
+.block-input {
+    margin-top: 5px;
+}
+
+.block-caption {
+    margin-top: 5px;
+    font-size: 0.9rem;
+    color: #aaa;
+}
+
+/* Extra styles for the Table Builder */
+.table-builder-controls {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.table-input {
+    width: 60px;
+    padding: 5px;
+    background: #333;
+    color: white;
+    border: 1px solid #555;
+}
+
+.generated-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+
+.generated-table td {
+    padding: 0;
+    border: 1px solid #555;
+}
+
+.generated-table input {
+    width: 100%;
+    border: none;
+    padding: 10px;
+    margin: 0;
+    background: rgba(0, 0, 0, 0.2);
+    color: white;
+}
+
+.generated-table input:focus {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+/* Quill Dark Mode Fixes */
+.ql-toolbar {
+    background: #ccc;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+}
+
+.ql-container {
+    background: #222;
+    color: white;
+    font-family: 'Poppins', sans-serif;
+    font-size: 1rem;
+    border-bottom-left-radius: 5px;
+    border-bottom-right-radius: 5px;
+}
+
+.ql-editor {
+    min-height: 150px;
+}
