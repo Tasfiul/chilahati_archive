@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Entry - Chilahati Archive</title>
+    <!-- Fonts & Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Quill Rich Text Editor CSS -->
+    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/admin-add.css">
+    <style>
+        .delete-btn {
+            background: #e74c3c;
+            color: white;
+            margin-top: 1rem;
+        }
+
+        .delete-btn:hover {
+            background: #c0392b;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+    </style>
+</head>
+
+<body>
+
+    <%- include('../../partials/navbar') %>
+
+        <div class="admin-container">
+            <header class="admin-header">
+                <h1><i class="fas fa-edit"></i> Edit Entry</h1>
+                <p>Update existing archive page.</p>
+            </header>
+
+            <form action="/admin/edit/<%= item._id %>" method="POST" id="mainForm">
+
+                <!-- SECTION 1: CLASSIFICATION -->
+                <div class="form-section">
+                    <h3><i class="fas fa-sitemap"></i> Classification</h3>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Main Category</label>
+                            <select name="category" id="categorySelect" required>
+                                <option value="">-- Select Main Category --</option>
+                                <option value="Institution" <%=item.category==='Institution' ? 'selected' : '' %>
+                                    >Institution (School, Govt, etc.)</option>
+                                <option value="Person" <%=item.category==='Person' ? 'selected' : '' %>>People (Freedom
+                                    Fighter, Student, etc.)</option>
+                                <option value="Heritage" <%=item.category==='Heritage' ? 'selected' : '' %>>Heritage
+                                    (History, Culture, etc.)</option>
+                                <option value="TouristSpot" <%=item.category==='TouristSpot' ? 'selected' : '' %>
+                                    >Tourist Spot</option>
+                                <option value="Transport" <%=item.category==='Transport' ? 'selected' : '' %>>Transport
+                                </option>
+                                <option value="Emergency" <%=item.category==='Emergency' ? 'selected' : '' %>>Emergency
+                                    Service</option>
+                                <option value="Organization" <%=item.category==='Organization' ? 'selected' : '' %>
+                                    >Social Work & Foundations</option>
+                                <option value="Narrative" <%=item.category==='Narrative' ? 'selected' : '' %>>Stories
+                                    (Heart Breaking, Success)</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group hidden" id="subTypeContainer">
+                            <label>Sub-Category (Important for Navigation)</label>
+                            <select name="subType" id="subTypeSelect">
+                                <!-- Dynamic Options Injected Here -->
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SECTION 2: BASIC INFO -->
+                <div class="form-section">
+                    <h3><i class="fas fa-info-circle"></i> Basic Info</h3>
+                    <div class="form-group">
+                        <label>Title</label>
+                        <input type="text" name="title" placeholder="Full name of person or place"
+                            value="<%= item.title %>" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Slug (URL Link)</label>
+                        <input type="text" name="slug" placeholder="e.g. chilahati-high-school" value="<%= item.slug %>"
+                            required>
+                    </div>
+                    <div class="form-group">
+                        <label>Thumbnail (Google Drive Image Link)</label>
+                        <input type="text" name="thumbnail" placeholder="The cover image card link"
+                            value="<%= item.thumbnail %>">
+                    </div>
+                </div>
+
+                <!-- SECTION 3: DYNAMIC DETAILS (Changes based on selection) -->
+                <div id="dynamicFields" class="form-section hidden">
+                    <h3><i class="fas fa-list-ul"></i> Specific Details</h3>
+
+                    <!-- A. LOCATION FIELDS -->
+                    <div id="locationGroup" class="hidden">
+                        <label>Google Maps Link</label>
+                        <input type="text" name="locationLink" placeholder="Paste link from Google Maps"
+                            value="<%= item.locationLink || '' %>">
+                        <label>Physical Address</label>
+                        <input type="text" name="address" placeholder="Location description"
+                            value="<%= item.address || '' %>">
+                        <!-- Hidden Lat/Lng if we want to preserve them -->
+                        <% if (item.coordinates) { %>
+                            <input type="hidden" name="lat" value="<%= item.coordinates.lat %>">
+                            <input type="hidden" name="lng" value="<%= item.coordinates.lng %>">
+                            <% } %>
+                    </div>
+
+                    <!-- B. INSTITUTION SPECIFIC -->
+                    <div id="InstitutionExtra" class="specific-group hidden">
+                        <label>Head of Institution</label>
+                        <input type="text" name="headOfInstitution" placeholder="e.g. Principal or Manager"
+                            value="<%= item.headOfInstitution || '' %>">
+                        <label>Established Date</label>
+                        <% let estDate='' ; if(item.establishedDate) estDate=new
+                            Date(item.establishedDate).toISOString().split('T')[0]; %>
+                            <input type="date" name="establishedDate" value="<%= estDate %>">
+                    </div>
+
+                    <!-- C. PERSON SPECIFIC -->
+                    <div id="PersonExtra" class="specific-group hidden">
+                        <label>Education/Profession</label>
+                        <input type="text" name="profession" placeholder="e.g. PhD, Artist, etc."
+                            value="<%= item.profession || '' %>">
+                        <label>Date of Birth</label>
+                        <% let dob='' ; if(item.dateOfBirth) dob=new Date(item.dateOfBirth).toISOString().split('T')[0];
+                            %>
+                            <input type="date" name="dateOfBirth" value="<%= dob %>">
+                            <label>Sector No (Only if Freedom Fighter)</label>
+                            <input type="text" name="sectorNo" placeholder="Which sector did they fight in?"
+                                value="<%= item.sectorNo || '' %>">
+                    </div>
+
+                    <!-- D. STORY/HERITAGE SPECIFIC -->
+                    <div id="NarrativeExtra" class="specific-group hidden">
+                        <label>Date of Event/Incident</label>
+                        <% let evDate='' ; if(item.eventDate) evDate=new
+                            Date(item.eventDate).toISOString().split('T')[0]; else if (item.dateOfIncident) evDate=new
+                            Date(item.dateOfIncident).toISOString().split('T')[0]; %>
+                            <input type="date" name="eventDate" value="<%= evDate %>">
+                    </div>
+                </div>
+
+                <!-- SECTION 4: BLOCK EDITOR (Wikipedia Content) -->
+                <div class="form-section">
+                    <h3><i class="fas fa-edit"></i> Page Content (Wikipedia Blocks)</h3>
+                    <div class="toolbar">
+                        <button type="button" class="tool-btn" onclick="addBlock('heading')"><i
+                                class="fas fa-heading"></i> Heading</button>
+                        <button type="button" class="tool-btn" onclick="addBlock('paragraph')"><i
+                                class="fas fa-paragraph"></i> Rich Text</button>
+                        <button type="button" class="tool-btn" onclick="addBlock('image')"><i class="fas fa-image"></i>
+                            Image</button>
+                        <button type="button" class="tool-btn" onclick="addBlock('video')"><i class="fas fa-video"></i>
+                            Video</button>
+                        <button type="button" class="tool-btn" onclick="addBlock('table')"><i class="fas fa-table"></i>
+                            Table</button>
+                        <button type="button" class="tool-btn" onclick="addBlock('pdf')"><i class="fas fa-file-pdf"></i>
+                            PDF</button>
+                    </div>
+
+                    <div id="editorContainer" class="block-editor">
+                        <div id="emptyMessage" style="text-align:center; padding: 40px; color: #888; display: none;">
+                            <i class="fas fa-layer-group" style="font-size: 3rem; margin-bottom: 10px;"></i>
+                            <p>No content blocks yet. Click the buttons above to build the story.</p>
+                        </div>
+                    </div>
+
+                    <!-- Hidden Input to store all content as JSON -->
+                    <input type="hidden" name="bodyContentJSON" id="bodyContentJSON">
+                </div>
+
+                <div class="btn-group">
+                    <button type="submit" class="btn-block save-btn">Update Entry</button>
+                    <button type="button" class="btn-block delete-btn" onclick="deleteItem()">Delete Entry</button>
+                </div>
+                <a href="/archive/<%= item.category %>" class="btn-block cancel-btn"
+                    style="margin-top: 1rem; display:block; text-align:center;">Cancel</a>
+            </form>
+        </div>
+
+        <!-- Scripts -->
+        <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
+
+        <script>
+            // 0. Initial Data from Server
+            const savedCategory = "<%= item.category %>";
+            const savedSubType = "<%= item.subType %>";
+            // prettier-ignore
+            const savedBlocks = <%- JSON.stringify(item.bodyContent || []) %>;
+
+            // 1. MAPPING CATEGORIES TO SUBTYPES
+            const subTypeMap = {
+                'Institution': ['Educational', 'Governmental', 'Financial', 'Religious', 'Medical', 'Other'],
+                'Person': ['Notable People', 'Freedom Fighter', 'Meritorious Student', 'Hidden Talent', 'Scholar'],
+                'Heritage': ['History', 'Culture', 'Occupation'],
+                'Organization': ['Social Work', 'Sopnotory Foundation', 'NGO', 'Club'],
+                'Emergency': ['Health', 'Police', 'Fire', 'Ambulance'],
+                'Transport': ['Bus', 'Train', 'Auto-Stand', 'Launch-Ghat'],
+                'Narrative': ['Heart Breaking Story', 'Success Story', 'Local Legend']
+            };
+
+            // 2. DYNAMIC DROPDOWN & FIELD LOGIC
+            const categorySelect = document.getElementById('categorySelect');
+            const subTypeContainer = document.getElementById('subTypeContainer');
+            const subTypeSelect = document.getElementById('subTypeSelect');
+            const dynamicFields = document.getElementById('dynamicFields');
+
+            function updateUIForCategory(cat) {
+                subTypeSelect.innerHTML = '';
+
+                // Hide everything first
+                subTypeContainer.classList.add('hidden');
+                dynamicFields.classList.add('hidden');
+                document.querySelectorAll('.specific-group, #locationGroup').forEach(el => el.classList.add('hidden'));
+
+                if (subTypeMap[cat]) {
+                    subTypeContainer.classList.remove('hidden');
+                    dynamicFields.classList.remove('hidden');
+
+                    // Fill Sub-Types
+                    subTypeMap[cat].forEach(sub => {
+                        let opt = document.createElement('option');
+                        opt.value = sub;
+                        opt.textContent = sub;
+                        subTypeSelect.appendChild(opt);
+                    });
+
+                    // Conditional Detail Visibility
+                    if (['Institution', 'TouristSpot', 'Emergency', 'Transport', 'Organization'].includes(cat)) {
+                        document.getElementById('locationGroup').classList.remove('hidden');
+                    }
+                    if (cat === 'Institution') document.getElementById('InstitutionExtra').classList.remove('hidden');
+                    if (cat === 'Person') document.getElementById('PersonExtra').classList.remove('hidden');
+                    if (cat === 'Narrative' || cat === 'Heritage') document.getElementById('NarrativeExtra').classList.remove('hidden');
+                }
+            }
+
+            categorySelect.addEventListener('change', function () {
+                updateUIForCategory(this.value);
+            });
+
+            // Initialize UI logic
+            if (savedCategory) {
+                updateUIForCategory(savedCategory);
+                if (savedSubType) {
+                    subTypeSelect.value = savedSubType;
+                }
+            }
+
+            // 3. BLOCK EDITOR LOGIC
+            const editorContainer = document.getElementById('editorContainer');
+            const quillInstances = {};
+
+            function addBlock(type, content = null) {
+                document.getElementById('emptyMessage').style.display = 'none';
+                const blockId = Date.now() + Math.floor(Math.random() * 1000); // Randomness for unique IDs
+                const blockDiv = document.createElement('div');
+                blockDiv.className = 'block-item';
+                blockDiv.dataset.id = blockId;
+                blockDiv.dataset.type = type;
+
+                let inner = `<span class="block-label">${type.toUpperCase()}</span>`;
+
+                if (type === 'heading') {
+                    const val = content || '';
+                    inner += `<input type="text" class="block-input" placeholder="Enter Sub-heading (e.g. Life History)" value="${val.replace(/"/g, '&quot;')}">`;
+                } else if (type === 'image') {
+                    const url = content ? content.url : '';
+                    const caption = content ? content.caption : '';
+                    inner += `<input type="text" class="block-input" placeholder="Google Drive Image URL" value="${url}">
+                          <input type="text" class="block-caption" placeholder="Image Caption" value="${caption.replace(/"/g, '&quot;')}">`;
+                } else if (type === 'video') {
+                    const val = content || '';
+                    inner += `<input type="text" class="block-input" placeholder="YouTube or Drive Link" value="${val}">`;
+                } else if (type === 'pdf') {
+                    const val = content || '';
+                    inner += `<input type="text" class="block-input" placeholder="Google Drive PDF Link" value="${val}">`;
+                } else if (type === 'paragraph') {
+                    inner += `<div id="quill-${blockId}" class="quill-editor"></div>`;
+                } else if (type === 'table') {
+                    inner += `<div class="table-controls">
+                    Rows: <input type="number" id="rows-${blockId}" value="3" style="width:50px"> 
+                    Cols: <input type="number" id="cols-${blockId}" value="2" style="width:50px">
+                    <button type="button" onclick="generateTable(${blockId})">Create Grid</button>
+                    <!-- Small instruction for edit mode -->
+                    <small style="margin-left:10px; color: #666;">(Clears existing table below)</small>
+                </div><div id="table-container-${blockId}"></div>`;
+                }
+
+                blockDiv.innerHTML = inner + `<button type="button" class="remove-btn" onclick="this.parentElement.remove()">×</button>`;
+                editorContainer.appendChild(blockDiv);
+
+                if (type === 'paragraph') {
+                    quillInstances[blockId] = new Quill(`#quill-${blockId}`, { theme: 'snow' });
+                    if (content) {
+                        quillInstances[blockId].root.innerHTML = content;
+                    }
+                }
+
+                if (type === 'table' && content) {
+                    // Try to re-hydrate table inputs
+                    // The content is a full HTML table string. 
+                    // We can just set it to the container, OR reconstruct the inputs.
+                    // The save logic expects inputs to exist inside td.
+                    // Existing format: <td><input value="..."></td>...
+                    // Wait, in save logic: tableHTML += `<td>${i.value}</td>`
+                    // IT SAVES THE VALUE DIRECTLY, NOT THE INPUT ELEMENT.
+                    // So <table ...><tr><td>Value</td></tr></table>
+                    // To edit, we need to convert back to inputs.
+
+                    // Helper to reconstruct inputs
+                    const tempDiv = document.createElement('div');
+                    tempDiv.innerHTML = content;
+                    const table = tempDiv.querySelector('table');
+                    if (table) {
+                        const rows = table.rows;
+                        let newTableHtml = '<table class="admin-table">';
+                        // Update row/col inputs
+                        const rCount = rows.length;
+                        const cCount = rows[0] ? rows[0].cells.length : 0;
+                        setTimeout(() => {
+                            if (document.getElementById(`rows-${blockId}`)) document.getElementById(`rows-${blockId}`).value = rCount;
+                            if (document.getElementById(`cols-${blockId}`)) document.getElementById(`cols-${blockId}`).value = cCount;
+                        }, 0);
+
+                        for (let i = 0; i < rCount; i++) {
+                            newTableHtml += '<tr>';
+                            for (let j = 0; j < cCount; j++) {
+                                const cellText = rows[i].cells[j].innerText;
+                                newTableHtml += `<td><input type="text" placeholder="Data" value="${cellText.replace(/"/g, '&quot;')}"></td>`;
+                            }
+                            newTableHtml += '</tr>';
+                        }
+                        newTableHtml += '</table>';
+
+                        // We need to inject this into table-container
+                        // Use timeout to ensure DOM is ready
+                        setTimeout(() => {
+                            document.getElementById(`table-container-${blockId}`).innerHTML = newTableHtml;
+                        }, 0);
+                    }
+                }
+            }
+
+            window.generateTable = function (id) {
+                const rows = document.getElementById(`rows-${id}`).value;
+                const cols = document.getElementById(`cols-${id}`).value;
+                let html = '<table class="admin-table">';
+                for (let i = 0; i < rows; i++) {
+                    html += '<tr>';
+                    for (let j = 0; j < cols; j++) html += '<td><input type="text" placeholder="Data"></td>';
+                    html += '</tr>';
+                }
+                document.getElementById(`table-container-${id}`).innerHTML = html + '</table>';
+            }
+
+            // Populate Blocks
+            if (savedBlocks && savedBlocks.length > 0) {
+                savedBlocks.sort((a, b) => a.order - b.order).forEach(block => {
+                    addBlock(block.type, block.content);
+                });
+            } else {
+                document.getElementById('emptyMessage').style.display = 'block';
+            }
+
+            // 4. PRE-SUBMIT: COLLECT EVERYTHING INTO JSON
+            document.getElementById('mainForm').addEventListener('submit', function (e) {
+                const blocks = document.querySelectorAll('.block-item');
+                let contentArray = [];
+
+                blocks.forEach((el, index) => {
+                    const type = el.dataset.type;
+                    const id = el.dataset.id;
+                    let content = '';
+
+                    if (type === 'paragraph') {
+                        content = quillInstances[id].root.innerHTML;
+                    } else if (type === 'heading') {
+                        content = el.querySelector('.block-input').value;
+                    } else if (type === 'image') {
+                        content = {
+                            url: el.querySelector('.block-input').value,
+                            caption: el.querySelector('.block-caption').value
+                        };
+                    } else if (type === 'video') {
+                        content = convertToEmbedUrl(el.querySelector('.block-input').value);
+                    } else if (type === 'pdf') {
+                        content = el.querySelector('.block-input').value;
+                    } else if (type === 'table') {
+                        const rowEls = el.querySelectorAll('tr');
+                        // Save as pure HTML table for display
+                        let tableHTML = '<table border="1" style="width:100%">';
+                        rowEls.forEach(r => {
+                            tableHTML += '<tr>';
+                            r.querySelectorAll('input').forEach(i => tableHTML += `<td>${i.value}</td>`);
+                            tableHTML += '</tr>';
+                        });
+                        content = tableHTML + '</table>';
+                    }
+
+                    contentArray.push({ type, content, order: index });
+                });
+
+                document.getElementById('bodyContentJSON').value = JSON.stringify(contentArray);
+            });
+
+            // Helper function
+            window.convertToEmbedUrl = function (url) {
+                if (!url) return '';
+                const ytMatch = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^\&\n?#]+)/);
+                if (ytMatch) return `https://www.youtube.com/embed/${ytMatch[1]}`;
+                const gdMatch = url.match(/drive\.google\.com\/file\/d\/([a-zA-Z0-9-_]+)/);
+                if (gdMatch) return `https://drive.google.com/file/d/${gdMatch[1]}/preview`;
+                if (url.includes('/embed/') || url.includes('/preview')) return url;
+                return url;
+            };
+
+            function deleteItem() {
+                if (confirm('Are you sure you want to delete this item? This action cannot be undone.')) {
+                    fetch('/admin/delete/<%= item._id %>', { method: 'DELETE' })
+                        .then(res => res.json())
+                        .then(data => {
+                            if (data.success) {
+                                alert('Item deleted successfully.');
+                                window.location.href = '/archive/<%= item.category %>';
+                            } else {
+                                alert('Error deleting: ' + (data.error || 'Unknown error'));
+                            }
+                        })
+                        .catch(e => alert('Network error please try again'));
+                }
+            }
+        </script>
+</body>
+
+</html>
