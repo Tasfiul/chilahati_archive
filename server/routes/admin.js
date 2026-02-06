@@ -110,6 +110,7 @@ router.get('/edit/:id', ensureStaff, async (req, res) => {
 router.post('/edit/:id', ensureStaff, async (req, res) => {
     try {
         const { title, slug, category, subType, thumbnail, bodyContentJSON, ...otherFields } = req.body;
+        console.log('DEBUG UPDATE locationLink:', otherFields.locationLink);
 
         // 1. Validate Category
         const SelectedModel = MODEL_MAP[category];

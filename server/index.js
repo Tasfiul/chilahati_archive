@@ -8,6 +8,7 @@ const passport = require('passport');
 const adminRoutes = require('./routes/admin'); // NEW
 const archiveRoutes = require('./routes/archive');
 const entryRoutes = require('./routes/entry');
+const searchRoutes = require('./routes/search'); // NEW
 
 // Passport Config
 require('./config/passport')(passport);
@@ -63,6 +64,7 @@ app.use('/', authRoutes);
 app.use('/admin', adminRoutes); // NEW: Access these at /admin/add
 app.use('/archive', archiveRoutes);
 app.use('/entry', entryRoutes); // NEW: Access these at /entry/add
+app.use('/search', searchRoutes);
 
 app.get('/', (req, res) => {
     res.render('home');

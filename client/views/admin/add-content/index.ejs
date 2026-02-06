@@ -80,7 +80,8 @@
                     <!-- A. LOCATION FIELDS -->
                     <div id="locationGroup" class="hidden">
                         <label>Google Maps Link</label>
-                        <input type="text" name="locationLink" placeholder="Paste link from Google Maps">
+                        <textarea name="locationLink" placeholder="Paste link from Google Maps (or just Place Name)"
+                            rows="2"><%= typeof locationLink !== 'undefined' ? locationLink : '' %></textarea>
                         <label>Physical Address</label>
                         <input type="text" name="address" placeholder="Location description">
                     </div>

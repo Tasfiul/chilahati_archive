@@ -116,47 +116,57 @@ body {
     width: 100%;
 }
 
-/* --- DROPDOWN CSS FIX START --- */
+/* --- DROPDOWN CSS (CLICK-BASED) START --- */
 .dropdown {
     position: relative;
     display: flex;
     align-items: center;
-    height: 100%;
-    /* Ensures the container takes full height if possible */
+}
+
+/* Style the button to look like a nav-item */
+.dropdown-toggle {
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+.dropdown-toggle::after {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 3px;
+    bottom: -5px;
+    left: 0;
+    background-color: #fff;
+    transition: width 0.3s;
+}
+
+.dropdown-toggle:hover::after {
+    width: 100%;
 }
 
 .dropdown-menu {
     display: none;
     position: absolute;
-    /* 1. Positioned further down to allow arrow space */
     top: 45px;
     left: 50%;
     transform: translateX(-50%);
     background: rgba(15, 23, 42, 0.95);
     backdrop-filter: blur(15px);
-    min-width: 220px;
+    min-width: 250px;
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
     border-radius: 10px;
     border: 1px solid var(--glass-border);
     padding: 10px 0;
     z-index: 1001;
     opacity: 0;
-    transition: opacity 0.3s ease;
+    transition: opacity 0.3s ease, transform 0.3s ease;
     max-height: 80vh;
-    /* Prevents menu from going off-screen */
     overflow-y: auto;
-    /* Adds a scrollbar if items exceed max-height */
-    display: none;
-    position: absolute;
-    top: 45px;
-    /* Adjust this if the gap is too large */
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 1001;
-    opacity: 0;
+    pointer-events: none;
 }
 
-/* 2. THE TRIANGLE ARROW (Aesthetic) */
+/* THE TRIANGLE ARROW (Aesthetic) */
 .dropdown-menu::before {
     content: "";
     position: absolute;
@@ -168,33 +178,28 @@ body {
     border-color: transparent transparent rgba(15, 23, 42, 0.95) transparent;
 }
 
-/* THE INVISIBLE BRIDGE (The Fix) */
-/* This creates an invisible block above the menu that catches your mouse */
-/* 1. THE INVISIBLE BRIDGE (The Fix) */
-/* This fills the empty space between the 'Categories' text and the menu */
-.dropdown-menu::after {
-    content: "";
-    position: absolute;
-    top: -45px;
-    /* This must match the 'top' value of .dropdown-menu */
-    left: 0;
-    width: 100%;
-    height: 45px;
-    /* This creates the 'bridge' so the mouse never leaves the hover zone */
-    background: transparent;
-}
-
-/* 3. SHOW ON HOVER */
-.dropdown:hover .dropdown-menu {
+/* SHOW DROPDOWN WHEN ACTIVE CLASS IS ADDED */
+.dropdown.active .dropdown-menu {
     display: block;
     opacity: 1;
-    animation: slideUp 0.3s ease forwards;
+    pointer-events: auto;
+    animation: slideDown 0.3s ease forwards;
 }
 
-@keyframes slideUp {
+/* Rotate chevron when active */
+.dropdown.active .fa-chevron-down {
+    transform: rotate(180deg);
+    transition: transform 0.3s ease;
+}
+
+.fa-chevron-down {
+    transition: transform 0.3s ease;
+}
+
+@keyframes slideDown {
     from {
         opacity: 0;
-        transform: translate(-50%, 10px);
+        transform: translate(-50%, -10px);
     }
 
     to {

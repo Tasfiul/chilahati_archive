@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>
+        <%= title %> - Chilahati Archive
+    </title>
+    <!-- Fonts & Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/archive-list.css">
+    <style>
+        .search-header {
+            padding: 3rem 5%;
+            background: linear-gradient(135deg, #2c3e50, #4ca1af);
+            color: white;
+            text-align: center;
+        }
+
+        .search-stats {
+            margin-top: 10px;
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+    </style>
+</head>
+
+<body>
+
+    <%- include('./partials/navbar') %>
+
+        <header class="search-header">
+            <h1><i class="fas fa-search"></i> Search Results</h1>
+            <p>Showing results for: "<strong>
+                    <%= query %>
+                </strong>"</p>
+            <div class="search-stats">
+                Found <%= totalResults %> matches • Page <%= currentPage %> of <%= totalPages %>
+            </div>
+        </header>
+
+        <div class="archive-container">
+
+            <% if (results.length===0) { %>
+                <div style="text-align:center; padding: 50px;">
+                    <i class="fas fa-search-minus" style="font-size: 4rem; color: #ccc;"></i>
+                    <h2 style="color: #666; margin-top: 20px;">No matches found for "<%= query %>"</h2>
+                    <p>Try searching for a different keyword or check the spelling.</p>
+                    <div style="margin-top: 20px;">
+                        <a href="/" class="btn-primary">Return Home</a>
+                    </div>
+                </div>
+                <% } else { %>
+                    <div class="archive-grid">
+                        <% results.forEach(item=> {
+                            /* FIX: Define image URL here to prevent quote conflicts in HTML */
+                            const imageUrl = item.thumbnail || '/images/default-card.jpg';
+                            %>
+                            <a href="/entry/<%= item.slug %>" class="archive-card">
+                                <div class="card-image" style="background-image: url('<%= imageUrl %>');">
+                                    <span class="category-badge">
+                                        <%= item.category %>
+                                    </span>
+                                </div>
+                                <div class="card-content">
+                                    <h3>
+                                        <%= item.title %>
+                                    </h3>
+                                    <div class="card-meta">
+                                        <% if (item.subType) { %>
+                                            <span><i class="fas fa-tag"></i>
+                                                <%= item.subType %>
+                                            </span>
+                                            <% } %>
+                                    </div>
+                                </div>
+                            </a>
+                            <% }); %>
+                    </div>
+
+                    <!-- PAGINATION -->
+                    <% if (totalPages> 1) { %>
+                        <div class="pagination">
+                            <% if (currentPage> 1) { %>
+                                <a href="/search?q=<%= query %>&page=<%= currentPage - 1 %>" class="page-link">&laquo;
+                                    Prev</a>
+                                <% } %>
+
+                                    <% let startPage=Math.max(1, currentPage - 2); let endPage=Math.min(totalPages,
+                                        currentPage + 2); for(let i=startPage; i <=endPage; i++) { %>
+                                        <a href="/search?q=<%= query %>&page=<%= i %>"
+                                            class="page-link <%= i === currentPage ? 'active' : '' %>">
+                                            <%= i %>
+                                        </a>
+                                        <% } %>
+
+                                            <% if (currentPage < totalPages) { %>
+                                                <a href="/search?q=<%= query %>&page=<%= currentPage + 1 %>"
+                                                    class="page-link">Next &raquo;</a>
+                                                <% } %>
+                        </div>
+                        <% } %>
+                            <% } %>
+
+        </div>
+
+        <%- include('./partials/footer') %>
+
+</body>
+
+</html>

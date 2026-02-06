@@ -32,6 +32,9 @@ const BaseSchema = new mongoose.Schema({
     tags: [String] // Helpful for filtering across categories
 }, baseOptions);
 
+// Enable Text Search on Title, Tags, and Slug
+BaseSchema.index({ title: 'text', tags: 'text', slug: 'text', category: 'text' });
+
 const ArchiveItem = mongoose.model('ArchiveItem', BaseSchema);
 
 // --- 3. Shared Field Objects (Mixins) ---

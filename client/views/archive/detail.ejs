@@ -186,8 +186,11 @@
                                                                     <% } %>
                             </table>
 
-                            <% if (item.locationLink) { %>
-                                <a href="<%= item.locationLink %>" target="_blank" class="map-btn">
+                            <% if (item.locationLink) { let mapUrl=item.locationLink.trim(); if
+                                (!mapUrl.startsWith('http')) {
+                                mapUrl=`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(item.locationLink)}`;
+                                } %>
+                                <a href="<%= mapUrl %>" target="_blank" class="map-btn">
                                     <i class="fas fa-map-marker-alt"></i> View on Google Maps
                                 </a>
                                 <% } %>
