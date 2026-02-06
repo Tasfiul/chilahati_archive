@@ -153,6 +153,13 @@ router.post('/profile/change-password', ensureAuthenticated, async (req, res) =>
     }
 });
 
+// GET: Forgot Password Page
+router.get('/forgot-password', (req, res) => {
+    res.render('user/forgot-password', {
+        user: req.user || null
+    });
+});
+
 // POST: Forgot Password (Send Reset Email)
 router.post('/forgot-password', async (req, res) => {
     try {
@@ -204,12 +211,23 @@ router.post('/forgot-password', async (req, res) => {
         await transporter.sendMail(mailOptions);
 
         req.flash('success_msg', 'Password reset email sent! Please check your inbox.');
-        res.redirect('/profile');
+
+        // Redirect based on authentication status
+        if (req.isAuthenticated()) {
+            res.redirect('/profile');
+        } else {
+            res.redirect('/forgot-password');
+        }
 
     } catch (err) {
         console.error('Error sending reset email:', err);
         req.flash('error_msg', 'An error occurred while sending reset email');
-        res.redirect('/profile');
+
+        if (req.isAuthenticated()) {
+            res.redirect('/profile');
+        } else {
+            res.redirect('/forgot-password');
+        }
     }
 });
 
