@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>
+        <%= title %> - Chilahati Archive
+    </title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+
+<body>
+
+    <%- include('../partials/navbar') %>
+
+        <div class="main-content">
+            <header style="text-align: center; margin-bottom: 3rem;">
+                <h1>
+                    <%= title %>
+                </h1>
+                <p class="subtitle">Select a specific category to explore</p>
+            </header>
+
+            <div class="menu-grid">
+                <% subTypes.forEach(sub=> {
+                    const slug = String(sub).toLowerCase().replace(/\s+/g,'-').replace(/[^a-z0-9-]/g,'');
+                    %>
+                    <a href="/archive/<%= category %>/<%= sub %>" class="card card-subtype card-<%= slug %>">
+                        <div class="card-content">
+                            <div class="card-icon"><i class="fas fa-folder-open"></i></div>
+                            <h3>
+                                <%= sub %>
+                            </h3>
+                            <p>View all entries under <%= sub %>
+                                    <%= category %>
+                            </p>
+                        </div>
+                        <i class="fas fa-arrow-right card-arrow"></i>
+                    </a>
+                    <% }) %>
+            </div>
+        </div>
+
+        <%- include('../partials/footer') %>
+
+</body>
+
+</html>

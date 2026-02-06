@@ -10,16 +10,29 @@
             <a href="#" class="nav-item">Categories <i class="fas fa-chevron-down"
                     style="font-size: 0.8em; margin-left: 5px;"></i></a>
             <div class="dropdown-menu">
-                <a href="#" class="dropdown-item"><i class="fas fa-history"></i> History</a>
-                <a href="#" class="dropdown-item"><i class="fas fa-palette"></i> Culture</a>
-                <a href="#" class="dropdown-item"><i class="fas fa-university"></i> Institutions</a>
-                <a href="#" class="dropdown-item"><i class="fas fa-users"></i> Notable People</a>
-                <a href="#" class="dropdown-item"><i class="fas fa-graduation-cap"></i> Local Scholars</a>
-                <a href="#" class="dropdown-item"><i class="fas fa-train"></i> Transport</a>
-                <a href="#" class="dropdown-item"><i class="fas fa-camera-retro"></i> Tourist Spots</a>
-                <a href="#" class="dropdown-item"><i class="fas fa-ambulance"></i> Emergency</a>
-                <a href="#" class="dropdown-item"><i class="fas fa-hands-helping"></i> Social Work</a>
-                <a href="#" class="dropdown-item"><i class="fas fa-map-marked-alt"></i> Interactive Map</a>
+                <a href="/archive/history" class="dropdown-item"><i class="fas fa-history"></i> History</a>
+                <a href="/archive/culture" class="dropdown-item"><i class="fas fa-palette"></i> Culture</a>
+                <a href="/archive/institution" class="dropdown-item"><i class="fas fa-university"></i> Institutions</a>
+                <a href="/archive/notable-people" class="dropdown-item"><i class="fas fa-user-tie"></i> Notable
+                    People</a>
+                <a href="/archive/freedom-fighter" class="dropdown-item"><i class="fas fa-fist-raised"></i> Freedom
+                    Fighters</a>
+                <a href="/archive/meritorious-student" class="dropdown-item"><i class="fas fa-user-graduate"></i>
+                    Meritorious Students</a>
+                <a href="/archive/occupation" class="dropdown-item"><i class="fas fa-tools"></i> Occupation</a>
+                <a href="/archive/hidden-talent" class="dropdown-item"><i class="fas fa-star"></i> Hidden Talent</a>
+                <a href="/archive/heart-breaking-story" class="dropdown-item"><i class="fas fa-heart-broken"></i>
+                    Breaking Stories</a>
+                <a href="/archive/tourist-spots" class="dropdown-item"><i class="fas fa-camera-retro"></i> Tourist
+                    Spots</a>
+                <a href="/archive/transport" class="dropdown-item"><i class="fas fa-train"></i> Transport</a>
+                <a href="/archive/emergency-service" class="dropdown-item"><i class="fas fa-hand-holding-medical"></i>
+                    Emergency</a>
+                <a href="/archive/social-work" class="dropdown-item"><i class="fas fa-hands-helping"></i> Social
+                    Work</a>
+                <a href="/archive/sopnotory-foundation" class="dropdown-item"><i class="fas fa-lightbulb"></i> Sopnotory
+                    Foundation</a>
+                <a href="/map" class="dropdown-item"><i class="fas fa-map-marked-alt"></i> Interactive Map</a>
             </div>
         </div>
 
@@ -42,7 +55,7 @@
             <a href="/login" class="login-btn">Login</a>
             <a href="/register" class="register-btn">Register</a>
             <% } else { %>
-                <!-- NEW: Admin/Supervisor Menu -->
+                <!-- Admin/Supervisor Menu -->
                 <% if (user.role==='admin' || user.role==='supervisor' ) { %>
                     <a href="/admin/add" class="nav-item" style="color: #ffda79;"><i class="fas fa-plus-circle"></i> Add
                         Content</a>
@@ -54,14 +67,13 @@
     </div>
 </nav>
 
-<!-- THEME TOGGLE SCRIPT (Now lives here!) -->
+<!-- THEME TOGGLE SCRIPT -->
 <script>
     document.addEventListener("DOMContentLoaded", function () {
         const themeToggleBtn = document.getElementById('theme-toggle');
         const body = document.body;
         const icon = themeToggleBtn.querySelector('i');
 
-        // 1. Check LocalStorage on load (Memory)
         const currentTheme = localStorage.getItem('theme');
         if (currentTheme === 'dark') {
             body.classList.add('dark-mode');
@@ -69,18 +81,17 @@
             icon.classList.add('fa-sun');
         }
 
-        // 2. Handle Click
         themeToggleBtn.addEventListener('click', () => {
             body.classList.toggle('dark-mode');
 
             if (body.classList.contains('dark-mode')) {
                 icon.classList.remove('fa-moon');
                 icon.classList.add('fa-sun');
-                localStorage.setItem('theme', 'dark'); // Save to memory
+                localStorage.setItem('theme', 'dark');
             } else {
                 icon.classList.remove('fa-sun');
                 icon.classList.add('fa-moon');
-                localStorage.setItem('theme', 'light'); // Save to memory
+                localStorage.setItem('theme', 'light');
             }
         });
     });

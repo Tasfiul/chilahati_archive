@@ -1,0 +1,122 @@
+/* Styles specific to archive list view */
+
+/* Layout tweaks for list cards */
+.list-grid {
+    align-items: start;
+}
+
+.card.item-card {
+    display: flex;
+    flex-direction: row;
+    gap: 1rem;
+    min-height: 130px;
+    padding: 0;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.item-thumb {
+    width: 220px;
+    min-width: 160px;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+    border-radius: 12px 0 0 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: rgba(0, 0, 0, 0.6);
+    font-size: 2.2rem;
+    background-color: rgba(255, 255, 255, 0.04);
+}
+
+.item-thumb--placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: rgba(255, 255, 255, 0.6);
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.02), rgba(0, 0, 0, 0.06));
+}
+
+.card.item-card .card-content {
+    padding: 1.2rem 1.6rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.card.item-card h3 {
+    font-size: 1.4rem;
+    margin: 0;
+}
+
+.item-excerpt {
+    font-size: 0.98rem;
+    opacity: 0.9;
+}
+
+.item-meta {
+    margin-top: 0.6rem;
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.badge {
+    background: rgba(255, 255, 255, 0.06);
+    padding: 6px 10px;
+    border-radius: 999px;
+    font-weight: 600;
+    font-size: 0.85rem;
+}
+
+.muted {
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.card.item-card .card-arrow {
+    right: 1rem;
+    bottom: 1rem;
+}
+
+/* Empty state styling */
+.empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 4rem 1rem;
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.empty-icon {
+    font-size: 3.2rem;
+    opacity: 0.3;
+}
+
+.empty-text {
+    margin-top: 1rem;
+}
+
+/* Responsive */
+@media (max-width: 820px) {
+    .card.item-card {
+        flex-direction: column;
+    }
+
+    .item-thumb {
+        width: 100%;
+        height: 160px;
+        border-radius: 12px 12px 0 0;
+    }
+
+    .card.item-card .card-content {
+        padding: 1rem;
+    }
+}
+
+/* Minor visual alignment with existing cards */
+.card.item-card {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+}

@@ -142,14 +142,25 @@ body {
     z-index: 1001;
     opacity: 0;
     transition: opacity 0.3s ease;
+    max-height: 80vh;
+    /* Prevents menu from going off-screen */
+    overflow-y: auto;
+    /* Adds a scrollbar if items exceed max-height */
+    display: none;
+    position: absolute;
+    top: 45px;
+    /* Adjust this if the gap is too large */
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1001;
+    opacity: 0;
 }
 
-/* The Triangle Arrow */
+/* 2. THE TRIANGLE ARROW (Aesthetic) */
 .dropdown-menu::before {
     content: "";
     position: absolute;
     bottom: 100%;
-    /* Positioned right on top of the menu */
     left: 50%;
     margin-left: -5px;
     border-width: 5px;
@@ -159,19 +170,21 @@ body {
 
 /* THE INVISIBLE BRIDGE (The Fix) */
 /* This creates an invisible block above the menu that catches your mouse */
+/* 1. THE INVISIBLE BRIDGE (The Fix) */
+/* This fills the empty space between the 'Categories' text and the menu */
 .dropdown-menu::after {
     content: "";
     position: absolute;
     top: -45px;
-    /* Reaches up to the text */
+    /* This must match the 'top' value of .dropdown-menu */
     left: 0;
     width: 100%;
     height: 45px;
-    /* Height of the gap */
+    /* This creates the 'bridge' so the mouse never leaves the hover zone */
     background: transparent;
 }
 
-/* Show Dropdown on Hover */
+/* 3. SHOW ON HOVER */
 .dropdown:hover .dropdown-menu {
     display: block;
     opacity: 1;
@@ -336,6 +349,8 @@ h1 {
     transition: all 0.3s ease;
 }
 
+/* --- Card Color Gradients --- */
+
 .card-history {
     background: linear-gradient(135deg, #FF6B6B, #556270);
 }
@@ -348,20 +363,42 @@ h1 {
     background: linear-gradient(135deg, #FFD93D, #FF6B6B);
 }
 
-.card-people {
+/* Notable People */
+.card-notable {
     background: linear-gradient(135deg, #0093E9, #80D0C7);
 }
 
-.card-Local_Scholars {
-    background: linear-gradient(135deg, #FF3CAC, #27AE60);
+/* Freedom Fighter (Red & Green theme for bravery/patriotism) */
+.card-freedom {
+    background: linear-gradient(135deg, #1e7d32, #c0392b);
 }
 
-.card-transport {
-    background: linear-gradient(135deg, #f39c12, #c0392b);
+/* Meritorious Student (Clean Academic Blue) */
+.card-student {
+    background: linear-gradient(135deg, #1e3c72, #2a5298);
+}
+
+/* Hidden Talent (Creative Gold/Purple) */
+.card-talent {
+    background: linear-gradient(135deg, #f39c12, #8e44ad);
+}
+
+/* Occupation (Earthy/Traditional colors) */
+.card-occupation {
+    background: linear-gradient(135deg, #d35400, #2c3e50);
+}
+
+/* Heart Breaking Stories (Deep emotional tones) */
+.card-stories {
+    background: linear-gradient(135deg, #4b6cb7, #182848);
 }
 
 .card-tourist {
     background: linear-gradient(135deg, #00b894, #00cec9);
+}
+
+.card-transport {
+    background: linear-gradient(135deg, #f39c12, #c0392b);
 }
 
 .card-emergency {
@@ -372,13 +409,79 @@ h1 {
     background: linear-gradient(135deg, #fd79a8, #e84393);
 }
 
+/* Sopnotory Foundation (Premium Brand Look) */
+.card-foundation {
+    background: linear-gradient(135deg, #6a11cb, #2575fc);
+}
+
 .card-map {
     background: linear-gradient(135deg, #0984e3, #74b9ff);
+}
+
+/* Keep the old scholar style as a backup or for specific use */
+.card-Local_Scholars {
+    background: linear-gradient(135deg, #FF3CAC, #27AE60);
 }
 
 .card-more {
     background: linear-gradient(135deg, #7F8C8D, #34495E);
 }
+
+/* Generic subcategory card base */
+.card-subtype {
+    background: linear-gradient(135deg, rgba(0, 0, 0, 0.15), rgba(0, 0, 0, 0.05));
+    border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+/* Specific subcategory flavors (fallbacks when no dedicated style exists) */
+.card-educational {
+    background: linear-gradient(135deg, #6DD5FA, #2980B9);
+}
+
+.card-governmental {
+    background: linear-gradient(135deg, #95a5a6, #2c3e50);
+}
+
+.card-financial {
+    background: linear-gradient(135deg, #f6d365, #fda085);
+}
+
+.card-religious {
+    background: linear-gradient(135deg, #8e9eab, #eef2f3);
+    color: #111;
+}
+
+.card-health {
+    background: linear-gradient(135deg, #7bdcb5, #2ecc71);
+}
+
+.card-other {
+    background: linear-gradient(135deg, #d7aefb, #7b1fa2);
+}
+
+/* Person-related subcategories */
+.card-notable-people {
+    background: linear-gradient(135deg, #0093E9, #80D0C7);
+}
+
+.card-freedom-fighter {
+    background: linear-gradient(135deg, #1e7d32, #c0392b);
+}
+
+.card-meritorious-students {
+    background: linear-gradient(135deg, #1e3c72, #2a5298);
+}
+
+.card-hidden-talent {
+    background: linear-gradient(135deg, #f39c12, #8e44ad);
+}
+
+/* Generic icon tweak for subtype cards */
+.card-subtype .card-icon {
+    font-size: 3rem;
+    opacity: 0.95;
+}
+
 
 .card::before {
     content: '';
@@ -605,4 +708,13 @@ body.dark-mode {
 
 .auth-link:hover {
     text-decoration: underline;
+}
+
+.dropdown-menu::-webkit-scrollbar {
+    width: 5px;
+}
+
+.dropdown-menu::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 10px;
 }

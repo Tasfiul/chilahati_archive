@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>
+        <%= typeof title !=='undefined' ? title : category %> - Chilahati Archive
+    </title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/list.css">
+</head>
+
+<body>
+
+    <%- include('../partials/navbar') %>
+
+        <div class="main-content">
+            <header style="margin-bottom: 2rem;">
+                <nav style="margin-bottom: 10px; font-size: 0.9rem; opacity: 0.7;">
+                    <a href="/" style="color: white;">Home</a> /
+                    <a href="/archive/<%= category %>" style="color: white;">
+                        <%= category %>
+                    </a>
+                    <% if (typeof subType !=='undefined' && subType) { %>
+                        / <a href="/archive/<%= category %>/<%= subType %>" style="color: white;">
+                            <%= subType %>
+                        </a>
+                        <% } %>
+                </nav>
+
+                <h1>
+                    <%= typeof title !=='undefined' ? title : category %>
+                </h1>
+                <p>
+                    <%= items && items.length ? items.length : 0 %> entries found in this archive.
+                </p>
+            </header>
+
+            <div class="menu-grid list-grid">
+                <% if (items && items.length> 0) { %>
+                    <% items.forEach(item=> { %>
+                        <a href="/entry/<%= item.slug %>" class="card item-card">
+                            <% if(item.thumbnail) { %>
+                                <div class="item-thumb" style="background-image: url('<%= item.thumbnail %>');"></div>
+                                <% } else { %>
+                                    <div class="item-thumb item-thumb--placeholder"><i class="fas fa-image"></i></div>
+                                    <% } %>
+
+                                        <div class="card-content">
+                                            <h3>
+                                                <%= item.title %>
+                                            </h3>
+                                            <p class="item-excerpt">Click to read the full archive...</p>
+                                            <div class="item-meta">
+                                                <span class="badge">
+                                                    <%= item.category %>
+                                                </span>
+                                                <% if (item.subType) { %><span class="muted"> • </span><span
+                                                        class="muted">
+                                                        <%= item.subType %>
+                                                    </span>
+                                                    <% } %>
+                                            </div>
+                                        </div>
+                                        <i class="fas fa-book-open card-arrow"></i>
+                        </a>
+                        <% }) %>
+                            <% } else { %>
+                                <div class="empty-state" style="grid-column: 1/-1;">
+                                    <i class="fas fa-inbox empty-icon"></i>
+                                    <p class="empty-text">No entries found here yet. Be the first to contribute!</p>
+                                </div>
+                                <% } %>
+            </div>
+        </div>
+
+        <%- include('../partials/footer') %>
+
+</body>
+
+</html>

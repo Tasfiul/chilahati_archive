@@ -6,6 +6,9 @@ const session = require('express-session');
 const flash = require('connect-flash');
 const passport = require('passport');
 const adminRoutes = require('./routes/admin'); // NEW
+const archiveRoutes = require('./routes/archive');
+const entryRoutes = require('./routes/entry');
+
 // Passport Config
 require('./config/passport')(passport);
 
@@ -58,6 +61,9 @@ app.use((req, res, next) => {
 const authRoutes = require('./routes/auth');
 app.use('/', authRoutes);
 app.use('/admin', adminRoutes); // NEW: Access these at /admin/add
+app.use('/archive', archiveRoutes);
+app.use('/entry', entryRoutes); // NEW: Access these at /entry/add
+
 app.get('/', (req, res) => {
     res.render('home');
 });

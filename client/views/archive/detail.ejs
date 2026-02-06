@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>
+        <%= item.title %> - Chilahati Archive
+    </title>
+
+    <!-- External Fonts & Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- CSS Files -->
+    <link rel="stylesheet" href="/css/style.css"> <!-- Your main global CSS -->
+    <link rel="stylesheet" href="/css/details.css"> <!-- The new Detail View CSS -->
+</head>
+
+<body>
+
+    <%- include('../partials/navbar') %>
+
+        <div class="main-content detail-page">
+            <div class="detail-container">
+
+                <!-- LEFT SIDE: Main Content -->
+                <article class="content-area">
+                    <header class="entry-header">
+                        <nav class="breadcrumb">
+                            <a href="/archive/<%= item.category %>">
+                                <%= item.category %>
+                            </a> /
+                            <a href="/archive/<%= item.category %>/<%= item.subType %>">
+                                <%= item.subType %>
+                            </a>
+                        </nav>
+                        <h1>
+                            <%= item.title %>
+                        </h1>
+                        <hr>
+                    </header>
+
+                    <!-- Loop through bodyContent blocks -->
+                    <div class="entry-body">
+                        <% item.bodyContent.sort((a,b)=> a.order - b.order).forEach(block => { %>
+
+                            <% if (block.type==='heading' ) { %>
+                                <h2 class="block-heading">
+                                    <%= block.content %>
+                                </h2>
+
+                                <% } else if (block.type==='paragraph' ) { %>
+                                    <div class="block-paragraph"><%- block.content %></div>
+
+                                    <% } else if (block.type==='image' ) { %>
+                                        <figure class="block-image">
+                                            <img src="<%= block.content.url %>"
+                                                alt="<%= block.content.caption || item.title %>"
+                                                style="max-width:100%; height:auto;">
+                                            <% if (block.content.caption) { %>
+                                                <figcaption>
+                                                    <%= block.content.caption %>
+                                                </figcaption>
+                                                <% } %>
+                                        </figure>
+
+                                        <% } else if (block.type==='video' ) { %>
+                                            <div class="block-video">
+                                                <% let embedUrl=block.content; const
+                                                    ytMatch=block.content.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^\&\n?#]+)/);
+                                                    if (ytMatch) embedUrl=`https://www.youtube.com/embed/${ytMatch[1]}`;
+                                                    const
+                                                    gdMatch=block.content.match(/drive\.google\.com\/file\/d\/([a-zA-Z0-9-_]+)/);
+                                                    if (gdMatch)
+                                                    embedUrl=`https://drive.google.com/file/d/${gdMatch[1]}/preview`; %>
+                                                    <iframe src="<%= embedUrl %>" frameborder="0"
+                                                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                                        allowfullscreen></iframe>
+                                            </div>
+
+                                            <% } else if (block.type==='table' ) { %>
+                                                <div class="block-table">
+                                                    <%- block.content %>
+                                                </div>
+
+                                                <% } else if (block.type==='pdf' ) { %>
+                                                    <div class="block-pdf">
+                                                        <iframe src="<%= block.content %>" width="100%"
+                                                            height="600px"></iframe>
+                                                        <a href="<%= block.content %>" target="_blank"
+                                                            class="download-link">
+                                                            <i class="fas fa-external-link-alt"></i> Open Document in
+                                                            New Tab
+                                                        </a>
+                                                    </div>
+                                                    <% } %>
+                                                        <% }) %>
+                    </div>
+
+                    <footer class="entry-footer">
+                        <p>Contributed by: <strong>
+                                <%= item.author ? item.author.username : 'Anonymous' %>
+                            </strong></p>
+                        <p>Last Updated: <%= new Date(item.updatedAt).toLocaleDateString() %>
+                        </p>
+                        <% if (user && (user.role==='admin' || user.role==='supervisor' )) { %>
+                            <div style="margin-top: 1.5rem; display: flex; gap: 1rem;">
+                                <a href="/admin/edit/<%= item._id %>" class="btn-edit"
+                                    style="padding: 0.6rem 1.2rem; background: #4a90e2; border-radius: 6px; text-decoration: none; color: white; font-weight: 600; display: inline-block;">
+                                    <i class="fas fa-edit"></i> Edit
+                                </a>
+                            </div>
+                            <% } %>
+                    </footer>
+                </article>
+
+                <!-- RIGHT SIDE: Infobox (Quick Facts) -->
+                <aside class="infobox">
+                    <div class="infobox-title">
+                        <%= item.title %>
+                    </div>
+
+                    <% if (item.thumbnail) { %>
+                        <div class="infobox-image">
+                            <img src="<%= item.thumbnail %>" alt="Thumbnail">
+                        </div>
+                        <% } %>
+
+                            <table class="infobox-table">
+                                <tr>
+                                    <th>Category</th>
+                                    <td>
+                                        <%= item.category %>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>Sub-type</th>
+                                    <td>
+                                        <%= item.subType %>
+                                    </td>
+                                </tr>
+
+                                <!-- Specific Fields -->
+                                <% if (item.establishedDate) { %>
+                                    <tr>
+                                        <th>Established</th>
+                                        <td>
+                                            <%= new Date(item.establishedDate).getFullYear() %>
+                                        </td>
+                                    </tr>
+                                    <% } %>
+                                        <% if (item.headOfInstitution) { %>
+                                            <tr>
+                                                <th>Head</th>
+                                                <td>
+                                                    <%= item.headOfInstitution %>
+                                                </td>
+                                            </tr>
+                                            <% } %>
+                                                <% if (item.profession) { %>
+                                                    <tr>
+                                                        <th>Profession</th>
+                                                        <td>
+                                                            <%= item.profession %>
+                                                        </td>
+                                                    </tr>
+                                                    <% } %>
+                                                        <% if (item.sectorNo) { %>
+                                                            <tr>
+                                                                <th>Sector</th>
+                                                                <td>
+                                                                    <%= item.sectorNo %>
+                                                                </td>
+                                                            </tr>
+                                                            <% } %>
+                                                                <% if (item.address) { %>
+                                                                    <tr>
+                                                                        <th>Address</th>
+                                                                        <td>
+                                                                            <%= item.address %>
+                                                                        </td>
+                                                                    </tr>
+                                                                    <% } %>
+                            </table>
+
+                            <% if (item.locationLink) { %>
+                                <a href="<%= item.locationLink %>" target="_blank" class="map-btn">
+                                    <i class="fas fa-map-marker-alt"></i> View on Google Maps
+                                </a>
+                                <% } %>
+                </aside>
+
+            </div>
+        </div>
+        <%- include('../partials/footer') %>
+</body>
+
+</html>

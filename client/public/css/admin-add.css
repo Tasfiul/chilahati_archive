@@ -168,3 +168,51 @@ textarea:focus {
 .ql-editor {
     min-height: 150px;
 }
+
+/* Button Styles for Edit Page */
+.btn-block {
+    display: inline-block;
+    width: 100%;
+    padding: 12px 24px;
+    margin-top: 10px;
+    text-align: center;
+    border: none;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    font-size: 1rem;
+}
+
+.save-btn {
+    background: #4a90e2;
+    color: white;
+}
+
+.save-btn:hover {
+    background: #357abd;
+    transform: translateY(-2px);
+}
+
+.cancel-btn {
+    background: #666;
+    color: white;
+    margin-top: 10px;
+}
+
+.cancel-btn:hover {
+    background: #555;
+    transform: translateY(-2px);
+}
+
+.delete-btn {
+    background: #e74c3c;
+    color: white;
+    margin-top: 10px;
+}
+
+.delete-btn:hover {
+    background: #c0392b;
+    transform: translateY(-2px);
+}
