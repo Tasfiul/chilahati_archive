@@ -213,8 +213,7 @@
                 if (type === 'heading') {
                     inner += `<input type="text" class="block-input" placeholder="Enter Sub-heading (e.g. Life History)">`;
                 } else if (type === 'image') {
-                    inner += `<input type="text" class="block-input" placeholder="Google Drive Image URL">
-                          <input type="text" class="block-caption" placeholder="Image Caption">`;
+                    inner += `<input type="text" class="block-input" placeholder="Google Drive Image URL">`;
                 } else if (type === 'video') {
                     inner += `<input type="text" class="block-input" placeholder="YouTube (youtube.com/watch?v=...) or Drive Link (drive.google.com/file/...)">`;
                 } else if (type === 'pdf') {
@@ -251,6 +250,13 @@
 
             // 4. PRE-SUBMIT: COLLECT EVERYTHING INTO JSON
             document.getElementById('mainForm').addEventListener('submit', function (e) {
+                // 1. Process Thumbnail
+                const thumbInput = document.querySelector('input[name="thumbnail"]');
+                if (thumbInput && thumbInput.value) {
+                    thumbInput.value = convertToDirectImageLink(thumbInput.value);
+                }
+
+                // 2. Process Blocks
                 const blocks = document.querySelectorAll('.block-item');
                 let contentArray = [];
 
@@ -264,10 +270,7 @@
                     } else if (type === 'heading') {
                         content = el.querySelector('.block-input').value;
                     } else if (type === 'image') {
-                        content = {
-                            url: el.querySelector('.block-input').value,
-                            caption: el.querySelector('.block-caption').value
-                        };
+                        content = convertToDirectImageLink(el.querySelector('.block-input').value);
                     } else if (type === 'video') {
                         content = convertToEmbedUrl(el.querySelector('.block-input').value);
                     } else if (type === 'pdf') {
@@ -300,6 +303,20 @@
                 if (gdMatch) return `https://drive.google.com/file/d/${gdMatch[1]}/preview`;
                 // Already embed URL
                 if (url.includes('/embed/') || url.includes('/preview')) return url;
+                return url;
+            };
+
+            window.convertToDirectImageLink = function (url) {
+                if (!url) return '';
+                // Check if it's already a direct Googleusercontent link or similar
+                // But we still want to force lh3 if it's a drive link to ensure reliability
+                if (url.includes('lh3.googleusercontent.com/d/')) return url;
+
+                // Extract File ID
+                const idMatch = url.match(/\/d\/([a-zA-Z0-9-_]+)/) || url.match(/id=([a-zA-Z0-9-_]+)/);
+                if (idMatch) {
+                    return `https://lh3.googleusercontent.com/d/${idMatch[1]}`;
+                }
                 return url;
             };
         </script>

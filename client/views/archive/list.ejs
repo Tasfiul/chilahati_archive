@@ -47,7 +47,11 @@
                     <% items.forEach(item=> { %>
                         <a href="/entry/<%= item.slug %>" class="card item-card">
                             <% if(item.thumbnail) { %>
-                                <div class="item-thumb" style="background-image: url('<%= item.thumbnail %>');"></div>
+                                <div class="item-thumb">
+                                    <img src="<%= item.thumbnail %>" alt="<%= item.title %>"
+                                        referrerpolicy="no-referrer"
+                                        style="width: 100%; height: 100%; object-fit: cover;">
+                                </div>
                                 <% } else { %>
                                     <div class="item-thumb item-thumb--placeholder"><i class="fas fa-image"></i></div>
                                     <% } %>

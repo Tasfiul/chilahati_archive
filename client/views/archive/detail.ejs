@@ -55,14 +55,16 @@
 
                                     <% } else if (block.type==='image' ) { %>
                                         <figure class="block-image">
-                                            <img src="<%= block.content.url %>"
-                                                alt="<%= block.content.caption || item.title %>"
-                                                style="max-width:100%; height:auto;">
-                                            <% if (block.content.caption) { %>
-                                                <figcaption>
-                                                    <%= block.content.caption %>
-                                                </figcaption>
-                                                <% } %>
+                                            <% let imgUrl='' ; let imgCaption='' ; if (typeof block.content==='string' )
+                                                { imgUrl=block.content; } else if (block.content && block.content.url) {
+                                                imgUrl=block.content.url; imgCaption=block.content.caption; } %>
+                                                <img src="<%= imgUrl %>" alt="<%= imgCaption || item.title %>"
+                                                    referrerpolicy="no-referrer" style="max-width:100%; height:auto;">
+                                                <% if (imgCaption) { %>
+                                                    <figcaption>
+                                                        <%= imgCaption %>
+                                                    </figcaption>
+                                                    <% } %>
                                         </figure>
 
                                         <% } else if (block.type==='video' ) { %>
@@ -123,7 +125,7 @@
 
                     <% if (item.thumbnail) { %>
                         <div class="infobox-image">
-                            <img src="<%= item.thumbnail %>" alt="Thumbnail">
+                            <img src="<%= item.thumbnail %>" alt="Thumbnail" referrerpolicy="no-referrer">
                         </div>
                         <% } %>
 
@@ -194,28 +196,6 @@
             </div>
         </div>
         <%- include('../partials/footer') %>
-            <!-- HELPER SCRIPT FOR IMAGE URLS -->
-            <script>
-                function getImageUrl(url) {
-                    if (!url) return '';
-                    // Check for Google Drive Link
-                    const gdMatch = url.match(/drive\.google\.com\/file\/d\/([a-zA-Z0-9-_]+)/);
-                    if (gdMatch) {
-                        return `https://drive.google.com/uc?export=view&id=${gdMatch[1]}`;
-                    }
-                    return url;
-                }
-
-                // Apply to all images on load
-                document.addEventListener('DOMContentLoaded', () => {
-                    document.querySelectorAll('img').forEach(img => {
-                        const originalSrc = img.getAttribute('src');
-                        if (originalSrc && originalSrc.includes('drive.google.com')) {
-                            img.src = getImageUrl(originalSrc);
-                        }
-                    });
-                });
-            </script>
 </body>
 
 </html>

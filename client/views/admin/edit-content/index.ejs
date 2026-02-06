@@ -280,10 +280,9 @@
                     const val = content || '';
                     inner += `<input type="text" class="block-input" placeholder="Enter Sub-heading (e.g. Life History)" value="${val.replace(/"/g, '&quot;')}">`;
                 } else if (type === 'image') {
-                    const url = content ? content.url : '';
-                    const caption = content ? content.caption : '';
-                    inner += `<input type="text" class="block-input" placeholder="Google Drive Image URL" value="${url}">
-                          <input type="text" class="block-caption" placeholder="Image Caption" value="${caption.replace(/"/g, '&quot;')}">`;
+                    // Handle both old object format and new string format
+                    const url = (typeof content === 'string') ? content : (content ? content.url : '');
+                    inner += `<input type="text" class="block-input" placeholder="Google Drive Image URL" value="${url}">`;
                 } else if (type === 'video') {
                     const val = content || '';
                     inner += `<input type="text" class="block-input" placeholder="YouTube or Drive Link" value="${val}">`;
@@ -380,6 +379,13 @@
 
             // 4. PRE-SUBMIT: COLLECT EVERYTHING INTO JSON
             document.getElementById('mainForm').addEventListener('submit', function (e) {
+                // 1. Process Thumbnail
+                const thumbInput = document.querySelector('input[name="thumbnail"]');
+                if (thumbInput && thumbInput.value) {
+                    thumbInput.value = convertToDirectImageLink(thumbInput.value);
+                }
+
+                // 2. Process Blocks
                 const blocks = document.querySelectorAll('.block-item');
                 let contentArray = [];
 
@@ -393,10 +399,7 @@
                     } else if (type === 'heading') {
                         content = el.querySelector('.block-input').value;
                     } else if (type === 'image') {
-                        content = {
-                            url: el.querySelector('.block-input').value,
-                            caption: el.querySelector('.block-caption').value
-                        };
+                        content = convertToDirectImageLink(el.querySelector('.block-input').value);
                     } else if (type === 'video') {
                         content = convertToEmbedUrl(el.querySelector('.block-input').value);
                     } else if (type === 'pdf') {
@@ -427,6 +430,20 @@
                 const gdMatch = url.match(/drive\.google\.com\/file\/d\/([a-zA-Z0-9-_]+)/);
                 if (gdMatch) return `https://drive.google.com/file/d/${gdMatch[1]}/preview`;
                 if (url.includes('/embed/') || url.includes('/preview')) return url;
+                return url;
+            };
+
+            window.convertToDirectImageLink = function (url) {
+                if (!url) return '';
+                // Check if it's already a direct Googleusercontent link or similar
+                // But we still want to force lh3 if it's a drive link to ensure reliability
+                if (url.includes('lh3.googleusercontent.com/d/')) return url;
+
+                // Extract File ID
+                const idMatch = url.match(/\/d\/([a-zA-Z0-9-_]+)/) || url.match(/id=([a-zA-Z0-9-_]+)/);
+                if (idMatch) {
+                    return `https://lh3.googleusercontent.com/d/${idMatch[1]}`;
+                }
                 return url;
             };
 
