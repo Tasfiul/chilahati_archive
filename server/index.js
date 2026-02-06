@@ -9,6 +9,7 @@ const adminRoutes = require('./routes/admin'); // NEW
 const archiveRoutes = require('./routes/archive');
 const entryRoutes = require('./routes/entry');
 const searchRoutes = require('./routes/search'); // NEW
+const userRoutes = require('./routes/user'); // NEW
 
 // Passport Config
 require('./config/passport')(passport);
@@ -65,6 +66,7 @@ app.use('/admin', adminRoutes); // NEW: Access these at /admin/add
 app.use('/archive', archiveRoutes);
 app.use('/entry', entryRoutes); // NEW: Access these at /entry/add
 app.use('/search', searchRoutes);
+app.use('/', userRoutes); // NEW: User profile routes
 
 app.get('/', (req, res) => {
     res.render('home');
