@@ -25,124 +25,151 @@
                 <p>Create a detailed Wikipedia-style archive page.</p>
             </header>
 
-            <form action="/admin/add" method="POST" id="mainForm">
-
-                <!-- SECTION 1: CLASSIFICATION -->
-                <div class="form-section">
-                    <h3><i class="fas fa-sitemap"></i> Classification</h3>
-
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>Main Category</label>
-                            <select name="category" id="categorySelect" required>
-                                <option value="">-- Select Main Category --</option>
-                                <option value="Institution">Institution (School, Govt, etc.)</option>
-                                <option value="Person">People (Freedom Fighter, Student, etc.)</option>
-                                <option value="Heritage">Heritage (History, Culture, etc.)</option>
-                                <option value="TouristSpot">Tourist Spot</option>
-                                <option value="Transport">Transport</option>
-                                <option value="Emergency">Emergency Service</option>
-                                <option value="Organization">Social Work & Foundations</option>
-                                <option value="Narrative">Stories (Heart Breaking, Success)</option>
-                            </select>
+            <% if (locals.success_msg && success_msg.length> 0) { %>
+                <div class="alert alert-success">
+                    <%= success_msg %>
+                </div>
+                <% } %>
+                    <% if (locals.error_msg && error_msg.length> 0) { %>
+                        <div class="alert alert-danger">
+                            <%= error_msg %>
                         </div>
+                        <% } %>
 
-                        <div class="form-group hidden" id="subTypeContainer">
-                            <label>Sub-Category (Important for Navigation)</label>
-                            <select name="subType" id="subTypeSelect">
-                                <!-- Dynamic Options Injected Here -->
-                            </select>
-                        </div>
-                    </div>
-                </div>
+                            <form action="/admin/add" method="POST" id="mainForm">
 
-                <!-- SECTION 2: BASIC INFO -->
-                <div class="form-section">
-                    <h3><i class="fas fa-info-circle"></i> Basic Info</h3>
-                    <div class="form-group">
-                        <label>Title</label>
-                        <input type="text" name="title" placeholder="Full name of person or place" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Slug (URL Link)</label>
-                        <input type="text" name="slug" placeholder="e.g. chilahati-high-school" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Thumbnail (Google Drive Image Link)</label>
-                        <input type="text" name="thumbnail" placeholder="The cover image card link">
-                    </div>
-                </div>
+                                <!-- SECTION 1: CLASSIFICATION -->
+                                <div class="form-section">
+                                    <h3><i class="fas fa-sitemap"></i> Classification</h3>
 
-                <!-- SECTION 3: DYNAMIC DETAILS (Changes based on selection) -->
-                <div id="dynamicFields" class="form-section hidden">
-                    <h3><i class="fas fa-list-ul"></i> Specific Details</h3>
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label>Main Category</label>
+                                            <select name="category" id="categorySelect" required>
+                                                <option value="">-- Select Main Category --</option>
+                                                <option value="history">History</option>
+                                                <option value="culture">Culture</option>
+                                                <option value="institution">Institution</option>
+                                                <option value="notable people">Notable People</option>
+                                                <option value="freedom fighters">Freedom Fighters</option>
+                                                <option value="meritorious student">Meritorious Student</option>
+                                                <option value="hidden talent">Hidden Talent</option>
+                                                <option value="occupation">Occupation</option>
+                                                <option value="Heartbreaking stories">Heartbreaking Stories</option>
+                                                <option value="tourist spots">Tourist Spots</option>
+                                                <option value="transport">Transport</option>
+                                                <option value="Emergency services">Emergency Services</option>
+                                                <option value="social works">Social Works</option>
+                                                <option value="interactive map">Interactive Map</option>
+                                            </select>
+                                        </div>
 
-                    <!-- A. LOCATION FIELDS -->
-                    <div id="locationGroup" class="hidden">
-                        <label>Google Maps Link</label>
-                        <textarea name="locationLink" placeholder="Paste link from Google Maps (or just Place Name)"
-                            rows="2"><%= typeof locationLink !== 'undefined' ? locationLink : '' %></textarea>
-                        <label>Physical Address</label>
-                        <input type="text" name="address" placeholder="Location description">
-                    </div>
+                                        <div class="form-group hidden" id="subTypeContainer">
+                                            <label>Sub-Category (Important for Navigation)</label>
+                                            <select name="subType" id="subTypeSelect">
+                                                <!-- Dynamic Options Injected Here -->
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
 
-                    <!-- B. INSTITUTION SPECIFIC -->
-                    <div id="InstitutionExtra" class="specific-group hidden">
-                        <label>Head of Institution</label>
-                        <input type="text" name="headOfInstitution" placeholder="e.g. Principal or Manager">
-                        <label>Established Date</label>
-                        <input type="date" name="establishedDate">
-                    </div>
+                                <!-- SECTION 2: BASIC INFO -->
+                                <div class="form-section">
+                                    <h3><i class="fas fa-info-circle"></i> Basic Info</h3>
+                                    <div class="form-group">
+                                        <label>Title</label>
+                                        <input type="text" name="title" placeholder="Full name of person or place"
+                                            required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Slug (URL Link)</label>
+                                        <input type="text" name="slug" placeholder="e.g. chilahati-high-school"
+                                            required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Thumbnail (Google Drive Image Link)</label>
+                                        <input type="text" name="thumbnail" placeholder="The cover image card link">
+                                    </div>
+                                </div>
 
-                    <!-- C. PERSON SPECIFIC -->
-                    <div id="PersonExtra" class="specific-group hidden">
-                        <label>Education/Profession</label>
-                        <input type="text" name="profession" placeholder="e.g. PhD, Artist, etc.">
-                        <label>Date of Birth</label>
-                        <input type="date" name="dateOfBirth">
-                        <label>Sector No (Only if Freedom Fighter)</label>
-                        <input type="text" name="sectorNo" placeholder="Which sector did they fight in?">
-                    </div>
+                                <!-- SECTION 3: DYNAMIC DETAILS (Changes based on selection) -->
+                                <div id="dynamicFields" class="form-section hidden">
+                                    <h3><i class="fas fa-list-ul"></i> Specific Details</h3>
 
-                    <!-- D. STORY/HERITAGE SPECIFIC -->
-                    <div id="NarrativeExtra" class="specific-group hidden">
-                        <label>Date of Event/Incident</label>
-                        <input type="date" name="eventDate">
-                    </div>
-                </div>
+                                    <!-- A. LOCATION FIELDS -->
+                                    <div id="locationGroup" class="hidden">
+                                        <label>Google Maps Link</label>
+                                        <textarea name="locationLink"
+                                            placeholder="Paste link from Google Maps (or just Place Name)"
+                                            rows="2"><%= typeof locationLink !== 'undefined' ? locationLink : '' %></textarea>
+                                        <label>Physical Address</label>
+                                        <input type="text" name="address" placeholder="Location description">
+                                    </div>
 
-                <!-- SECTION 4: BLOCK EDITOR (Wikipedia Content) -->
-                <div class="form-section">
-                    <h3><i class="fas fa-edit"></i> Page Content (Wikipedia Blocks)</h3>
-                    <div class="toolbar">
-                        <button type="button" class="tool-btn" onclick="addBlock('heading')"><i
-                                class="fas fa-heading"></i> Heading</button>
-                        <button type="button" class="tool-btn" onclick="addBlock('paragraph')"><i
-                                class="fas fa-paragraph"></i> Rich Text</button>
-                        <button type="button" class="tool-btn" onclick="addBlock('image')"><i class="fas fa-image"></i>
-                            Image</button>
-                        <button type="button" class="tool-btn" onclick="addBlock('video')"><i class="fas fa-video"></i>
-                            Video</button>
-                        <button type="button" class="tool-btn" onclick="addBlock('table')"><i class="fas fa-table"></i>
-                            Table</button>
-                        <button type="button" class="tool-btn" onclick="addBlock('pdf')"><i class="fas fa-file-pdf"></i>
-                            PDF</button>
-                    </div>
+                                    <!-- B. INSTITUTION SPECIFIC -->
+                                    <div id="InstitutionExtra" class="specific-group hidden">
+                                        <label>Head of Institution</label>
+                                        <input type="text" name="headOfInstitution"
+                                            placeholder="e.g. Principal or Manager">
+                                        <label>Established Date</label>
+                                        <input type="date" name="establishedDate">
+                                    </div>
 
-                    <div id="editorContainer" class="block-editor">
-                        <div id="emptyMessage" style="text-align:center; padding: 40px; color: #888;">
-                            <i class="fas fa-layer-group" style="font-size: 3rem; margin-bottom: 10px;"></i>
-                            <p>No content blocks yet. Click the buttons above to build the story.</p>
-                        </div>
-                    </div>
+                                    <!-- C. PERSON SPECIFIC -->
+                                    <div id="PersonExtra" class="specific-group hidden">
+                                        <label>Education/Profession</label>
+                                        <input type="text" name="profession" placeholder="e.g. PhD, Artist, etc.">
+                                        <label>Date of Birth</label>
+                                        <input type="date" name="dateOfBirth">
+                                        <label>Sector No (Only if Freedom Fighter)</label>
+                                        <input type="text" name="sectorNo"
+                                            placeholder="Which sector did they fight in?">
+                                    </div>
 
-                    <!-- Hidden Input to store all content as JSON -->
-                    <input type="hidden" name="bodyContentJSON" id="bodyContentJSON">
-                </div>
+                                    <!-- D. STORY/HERITAGE SPECIFIC -->
+                                    <div id="NarrativeExtra" class="specific-group hidden">
+                                        <label>Date of Event/Incident</label>
+                                        <input type="date" name="eventDate">
+                                    </div>
+                                </div>
 
-                <button type="submit" class="btn-block save-btn">Save to Archive</button>
-                <a href="/" class="btn-block cancel-btn">Cancel</a>
-            </form>
+                                <!-- SECTION 4: BLOCK EDITOR (Wikipedia Content) -->
+                                <div class="form-section">
+                                    <h3><i class="fas fa-edit"></i> Page Content (Wikipedia Blocks)</h3>
+                                    <div class="toolbar">
+                                        <button type="button" class="tool-btn" onclick="addBlock('heading')"><i
+                                                class="fas fa-heading"></i> Heading</button>
+                                        <button type="button" class="tool-btn" onclick="addBlock('paragraph')"><i
+                                                class="fas fa-paragraph"></i> Rich Text</button>
+                                        <button type="button" class="tool-btn" onclick="addBlock('image')"><i
+                                                class="fas fa-image"></i>
+                                            Image</button>
+                                        <button type="button" class="tool-btn" onclick="addBlock('video')"><i
+                                                class="fas fa-video"></i>
+                                            Video</button>
+                                        <button type="button" class="tool-btn" onclick="addBlock('link')"><i
+                                                class="fas fa-link"></i>
+                                            Link</button>
+                                        <button type="button" class="tool-btn" onclick="addBlock('pdf')"><i
+                                                class="fas fa-file-pdf"></i>
+                                            PDF</button>
+                                    </div>
+
+                                    <div id="editorContainer" class="block-editor">
+                                        <div id="emptyMessage" style="text-align:center; padding: 40px; color: #888;">
+                                            <i class="fas fa-layer-group"
+                                                style="font-size: 3rem; margin-bottom: 10px;"></i>
+                                            <p>No content blocks yet. Click the buttons above to build the story.</p>
+                                        </div>
+                                    </div>
+
+                                    <!-- Hidden Input to store all content as JSON -->
+                                    <input type="hidden" name="bodyContentJSON" id="bodyContentJSON">
+                                </div>
+
+                                <button type="submit" class="btn-block save-btn">Save to Archive</button>
+                                <a href="/" class="btn-block cancel-btn">Cancel</a>
+                            </form>
         </div>
 
         <!-- Scripts -->
@@ -151,13 +178,9 @@
         <script>
             // 1. MAPPING CATEGORIES TO SUBTYPES
             const subTypeMap = {
-                'Institution': ['Educational', 'Governmental', 'Financial', 'Religious', 'Medical', 'Other'],
-                'Person': ['Notable People', 'Freedom Fighter', 'Meritorious Student', 'Hidden Talent', 'Scholar'],
-                'Heritage': ['History', 'Culture', 'Occupation'],
-                'Organization': ['Social Work', 'Sopnotory Foundation', 'NGO', 'Club'],
-                'Emergency': ['Health', 'Police', 'Fire', 'Ambulance'],
-                'Transport': ['Bus', 'Train', 'Auto-Stand', 'Launch-Ghat'],
-                'Narrative': ['Heart Breaking Story', 'Success Story', 'Local Legend']
+                'institution': ['educational', 'governmental', 'Banks', 'Religious', 'other'],
+                'transport': ['bus', 'train', 'auto stand', 'launch-ghat'],
+                'Emergency services': ['hospitals', 'police', 'fire']
             };
 
             // 2. DYNAMIC DROPDOWN & FIELD LOGIC
@@ -172,12 +195,16 @@
 
                 // Hide everything first
                 subTypeContainer.classList.add('hidden');
-                dynamicFields.classList.add('hidden');
+                dynamicFields.classList.remove('hidden'); // Reveal dynamic section if a category is selected
                 document.querySelectorAll('.specific-group, #locationGroup').forEach(el => el.classList.add('hidden'));
+
+                if (!cat) {
+                    dynamicFields.classList.add('hidden');
+                    return;
+                }
 
                 if (subTypeMap[cat]) {
                     subTypeContainer.classList.remove('hidden');
-                    dynamicFields.classList.remove('hidden');
 
                     // Fill Sub-Types
                     subTypeMap[cat].forEach(sub => {
@@ -186,14 +213,18 @@
                         opt.textContent = sub;
                         subTypeSelect.appendChild(opt);
                     });
+                }
 
-                    // Conditional Detail Visibility
-                    if (['Institution', 'TouristSpot', 'Emergency', 'Transport', 'Organization'].includes(cat)) {
-                        document.getElementById('locationGroup').classList.remove('hidden');
-                    }
-                    if (cat === 'Institution') document.getElementById('InstitutionExtra').classList.remove('hidden');
-                    if (cat === 'Person') document.getElementById('PersonExtra').classList.remove('hidden');
-                    if (cat === 'Narrative' || cat === 'Heritage') document.getElementById('NarrativeExtra').classList.remove('hidden');
+                // Conditional Detail Visibility
+                if (['institution', 'tourist spots', 'transport', 'Emergency services', 'social works', 'interactive map'].includes(cat) || subTypeMap[cat]) {
+                    document.getElementById('locationGroup').classList.remove('hidden');
+                }
+                if (cat === 'institution') document.getElementById('InstitutionExtra').classList.remove('hidden');
+                if (['notable people', 'freedom fighters', 'meritorious student', 'hidden talent'].includes(cat)) {
+                    document.getElementById('PersonExtra').classList.remove('hidden');
+                }
+                if (['history', 'culture', 'Heartbreaking stories'].includes(cat)) {
+                    document.getElementById('NarrativeExtra').classList.remove('hidden');
                 }
             });
 
@@ -218,15 +249,15 @@
                 } else if (type === 'video') {
                     inner += `<input type="text" class="block-input" placeholder="YouTube (youtube.com/watch?v=...) or Drive Link (drive.google.com/file/...)">`;
                 } else if (type === 'pdf') {
-                    inner += `<input type="text" class="block-input" placeholder="Google Drive PDF Link">`;
+                    inner += `<input type="text" class="block-input" placeholder="Google Drive PDF Link">
+                              <small style="color: #4a90e2; display: block; margin-top: 5px;">
+                                <i class="fas fa-info-circle"></i> Tip: Ensure sharing is set to "Anyone with the link"
+                              </small>`;
+                } else if (type === 'link') {
+                    inner += `<input type="text" class="block-input link-title" placeholder="Link Title (e.g. Download Form)">
+                              <input type="text" class="block-input link-url" placeholder="Paste external URL here">`;
                 } else if (type === 'paragraph') {
                     inner += `<div id="quill-${blockId}" class="quill-editor"></div>`;
-                } else if (type === 'table') {
-                    inner += `<div class="table-controls">
-                    Rows: <input type="number" id="rows-${blockId}" value="3" style="width:50px"> 
-                    Cols: <input type="number" id="cols-${blockId}" value="2" style="width:50px">
-                    <button type="button" onclick="generateTable(${blockId})">Create Grid</button>
-                </div><div id="table-container-${blockId}"></div>`;
                 }
 
                 blockDiv.innerHTML = inner + `<button type="button" class="remove-btn" onclick="this.parentElement.remove()">×</button>`;
@@ -235,18 +266,6 @@
                 if (type === 'paragraph') {
                     quillInstances[blockId] = new Quill(`#quill-${blockId}`, { theme: 'snow' });
                 }
-            }
-
-            window.generateTable = function (id) {
-                const rows = document.getElementById(`rows-${id}`).value;
-                const cols = document.getElementById(`cols-${id}`).value;
-                let html = '<table class="admin-table">';
-                for (let i = 0; i < rows; i++) {
-                    html += '<tr>';
-                    for (let j = 0; j < cols; j++) html += '<td><input type="text" placeholder="Data"></td>';
-                    html += '</tr>';
-                }
-                document.getElementById(`table-container-${id}`).innerHTML = html + '</table>';
             }
 
             // 4. PRE-SUBMIT: COLLECT EVERYTHING INTO JSON
@@ -275,16 +294,11 @@
                     } else if (type === 'video') {
                         content = convertToEmbedUrl(el.querySelector('.block-input').value);
                     } else if (type === 'pdf') {
-                        content = el.querySelector('.block-input').value;
-                    } else if (type === 'table') {
-                        const rowEls = el.querySelectorAll('tr');
-                        let tableHTML = '<table border="1" style="width:100%">';
-                        rowEls.forEach(r => {
-                            tableHTML += '<tr>';
-                            r.querySelectorAll('input').forEach(i => tableHTML += `<td>${i.value}</td>`);
-                            tableHTML += '</tr>';
-                        });
-                        content = tableHTML + '</table>';
+                        content = convertToEmbedUrl(el.querySelector('.block-input').value);
+                    } else if (type === 'link') {
+                        const title = el.querySelector('.link-title').value;
+                        const url = el.querySelector('.link-url').value;
+                        content = JSON.stringify({ title, url });
                     }
 
                     contentArray.push({ type, content, order: index });

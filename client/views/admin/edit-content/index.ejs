@@ -42,6 +42,17 @@
                 <p>Update existing archive page.</p>
             </header>
 
+            <% if (locals.success_msg && success_msg.length > 0) { %>
+                <div class="alert alert-success">
+                    <%= success_msg %>
+                </div>
+            <% } %>
+            <% if (locals.error_msg && error_msg.length > 0) { %>
+                <div class="alert alert-danger">
+                    <%= error_msg %>
+                </div>
+            <% } %>
+
             <form action="/admin/edit/<%= item._id %>" method="POST" id="mainForm">
 
                 <!-- SECTION 1: CLASSIFICATION -->
@@ -53,22 +64,20 @@
                             <label>Main Category</label>
                             <select name="category" id="categorySelect" required>
                                 <option value="">-- Select Main Category --</option>
-                                <option value="Institution" <%=item.category==='Institution' ? 'selected' : '' %>
-                                    >Institution (School, Govt, etc.)</option>
-                                <option value="Person" <%=item.category==='Person' ? 'selected' : '' %>>People (Freedom
-                                    Fighter, Student, etc.)</option>
-                                <option value="Heritage" <%=item.category==='Heritage' ? 'selected' : '' %>>Heritage
-                                    (History, Culture, etc.)</option>
-                                <option value="TouristSpot" <%=item.category==='TouristSpot' ? 'selected' : '' %>
-                                    >Tourist Spot</option>
-                                <option value="Transport" <%=item.category==='Transport' ? 'selected' : '' %>>Transport
-                                </option>
-                                <option value="Emergency" <%=item.category==='Emergency' ? 'selected' : '' %>>Emergency
-                                    Service</option>
-                                <option value="Organization" <%=item.category==='Organization' ? 'selected' : '' %>
-                                    >Social Work & Foundations</option>
-                                <option value="Narrative" <%=item.category==='Narrative' ? 'selected' : '' %>>Stories
-                                    (Heart Breaking, Success)</option>
+                                <option value="history" <%=item.category==='history' ? 'selected' : '' %>>History</option>
+                                <option value="culture" <%=item.category==='culture' ? 'selected' : '' %>>Culture</option>
+                                <option value="institution" <%=item.category==='institution' ? 'selected' : '' %>>Institution</option>
+                                <option value="notable people" <%=item.category==='notable people' ? 'selected' : '' %>>Notable People</option>
+                                <option value="freedom fighters" <%=item.category==='freedom fighters' ? 'selected' : '' %>>Freedom Fighters</option>
+                                <option value="meritorious student" <%=item.category==='meritorious student' ? 'selected' : '' %>>Meritorious Student</option>
+                                <option value="hidden talent" <%=item.category==='hidden talent' ? 'selected' : '' %>>Hidden Talent</option>
+                                <option value="occupation" <%=item.category==='occupation' ? 'selected' : '' %>>Occupation</option>
+                                <option value="Heartbreaking stories" <%=item.category==='Heartbreaking stories' ? 'selected' : '' %>>Heartbreaking Stories</option>
+                                <option value="tourist spots" <%=item.category==='tourist spots' ? 'selected' : '' %>>Tourist Spots</option>
+                                <option value="transport" <%=item.category==='transport' ? 'selected' : '' %>>Transport</option>
+                                <option value="Emergency services" <%=item.category==='Emergency services' ? 'selected' : '' %>>Emergency Services</option>
+                                <option value="social works" <%=item.category==='social works' ? 'selected' : '' %>>Social Works</option>
+                                <option value="interactive map" <%=item.category==='interactive map' ? 'selected' : '' %>>Interactive Map</option>
                             </select>
                         </div>
 
@@ -166,8 +175,8 @@
                             Image</button>
                         <button type="button" class="tool-btn" onclick="addBlock('video')"><i class="fas fa-video"></i>
                             Video</button>
-                        <button type="button" class="tool-btn" onclick="addBlock('table')"><i class="fas fa-table"></i>
-                            Table</button>
+                        <button type="button" class="tool-btn" onclick="addBlock('link')"><i class="fas fa-link"></i>
+                            Link</button>
                         <button type="button" class="tool-btn" onclick="addBlock('pdf')"><i class="fas fa-file-pdf"></i>
                             PDF</button>
                     </div>
@@ -204,13 +213,9 @@
 
             // 1. MAPPING CATEGORIES TO SUBTYPES
             const subTypeMap = {
-                'Institution': ['Educational', 'Governmental', 'Financial', 'Religious', 'Medical', 'Other'],
-                'Person': ['Notable People', 'Freedom Fighter', 'Meritorious Student', 'Hidden Talent', 'Scholar'],
-                'Heritage': ['History', 'Culture', 'Occupation'],
-                'Organization': ['Social Work', 'Sopnotory Foundation', 'NGO', 'Club'],
-                'Emergency': ['Health', 'Police', 'Fire', 'Ambulance'],
-                'Transport': ['Bus', 'Train', 'Auto-Stand', 'Launch-Ghat'],
-                'Narrative': ['Heart Breaking Story', 'Success Story', 'Local Legend']
+                'institution': ['educational', 'governmental', 'Banks', 'Religious', 'other'],
+                'transport': ['bus', 'train', 'auto stand', 'launch-ghat'],
+                'Emergency services': ['hospitals', 'police', 'fire']
             };
 
             // 2. DYNAMIC DROPDOWN & FIELD LOGIC
@@ -224,12 +229,16 @@
 
                 // Hide everything first
                 subTypeContainer.classList.add('hidden');
-                dynamicFields.classList.add('hidden');
+                dynamicFields.classList.remove('hidden'); // Reveal dynamic section if a category is selected
                 document.querySelectorAll('.specific-group, #locationGroup').forEach(el => el.classList.add('hidden'));
+
+                if (!cat) {
+                    dynamicFields.classList.add('hidden');
+                    return;
+                }
 
                 if (subTypeMap[cat]) {
                     subTypeContainer.classList.remove('hidden');
-                    dynamicFields.classList.remove('hidden');
 
                     // Fill Sub-Types
                     subTypeMap[cat].forEach(sub => {
@@ -238,14 +247,18 @@
                         opt.textContent = sub;
                         subTypeSelect.appendChild(opt);
                     });
+                }
 
-                    // Conditional Detail Visibility
-                    if (['Institution', 'TouristSpot', 'Emergency', 'Transport', 'Organization'].includes(cat)) {
-                        document.getElementById('locationGroup').classList.remove('hidden');
-                    }
-                    if (cat === 'Institution') document.getElementById('InstitutionExtra').classList.remove('hidden');
-                    if (cat === 'Person') document.getElementById('PersonExtra').classList.remove('hidden');
-                    if (cat === 'Narrative' || cat === 'Heritage') document.getElementById('NarrativeExtra').classList.remove('hidden');
+                // Conditional Detail Visibility
+                if (['institution', 'tourist spots', 'transport', 'Emergency services', 'social works', 'interactive map'].includes(cat) || subTypeMap[cat]) {
+                    document.getElementById('locationGroup').classList.remove('hidden');
+                }
+                if (cat === 'institution') document.getElementById('InstitutionExtra').classList.remove('hidden');
+                if (['notable people', 'freedom fighters', 'meritorious student', 'hidden talent'].includes(cat)) {
+                    document.getElementById('PersonExtra').classList.remove('hidden');
+                }
+                if (['history', 'culture', 'Heartbreaking stories'].includes(cat)) {
+                    document.getElementById('NarrativeExtra').classList.remove('hidden');
                 }
             }
 
@@ -287,17 +300,25 @@
                     inner += `<input type="text" class="block-input" placeholder="YouTube or Drive Link" value="${val}">`;
                 } else if (type === 'pdf') {
                     const val = content || '';
-                    inner += `<input type="text" class="block-input" placeholder="Google Drive PDF Link" value="${val}">`;
+                    inner += `<input type="text" class="block-input" placeholder="Google Drive PDF Link" value="${val}">
+                              <small style="color: #4a90e2; display: block; margin-top: 5px;">
+                                <i class="fas fa-info-circle"></i> Tip: Ensure sharing is set to "Anyone with the link"
+                              </small>`;
+                } else if (type === 'link') {
+                    let title = '', url = '';
+                    if (content) {
+                        try {
+                            const linkData = JSON.parse(content);
+                            title = linkData.title || '';
+                            url = linkData.url || '';
+                        } catch (e) {
+                            url = content; // Fallback if it's just a raw URL
+                        }
+                    }
+                    inner += `<input type="text" class="block-input link-title" placeholder="Link Title (e.g. Download Form)" value="${title}">
+                              <input type="text" class="block-input link-url" placeholder="Paste external URL here" value="${url}">`;
                 } else if (type === 'paragraph') {
                     inner += `<div id="quill-${blockId}" class="quill-editor"></div>`;
-                } else if (type === 'table') {
-                    inner += `<div class="table-controls">
-                    Rows: <input type="number" id="rows-${blockId}" value="3" style="width:50px"> 
-                    Cols: <input type="number" id="cols-${blockId}" value="2" style="width:50px">
-                    <button type="button" onclick="generateTable(${blockId})">Create Grid</button>
-                    <!-- Small instruction for edit mode -->
-                    <small style="margin-left:10px; color: #666;">(Clears existing table below)</small>
-                </div><div id="table-container-${blockId}"></div>`;
                 }
 
                 blockDiv.innerHTML = inner + `<button type="button" class="remove-btn" onclick="this.parentElement.remove()">×</button>`;
@@ -309,62 +330,6 @@
                         quillInstances[blockId].root.innerHTML = content;
                     }
                 }
-
-                if (type === 'table' && content) {
-                    // Try to re-hydrate table inputs
-                    // The content is a full HTML table string. 
-                    // We can just set it to the container, OR reconstruct the inputs.
-                    // The save logic expects inputs to exist inside td.
-                    // Existing format: <td><input value="..."></td>...
-                    // Wait, in save logic: tableHTML += `<td>${i.value}</td>`
-                    // IT SAVES THE VALUE DIRECTLY, NOT THE INPUT ELEMENT.
-                    // So <table ...><tr><td>Value</td></tr></table>
-                    // To edit, we need to convert back to inputs.
-
-                    // Helper to reconstruct inputs
-                    const tempDiv = document.createElement('div');
-                    tempDiv.innerHTML = content;
-                    const table = tempDiv.querySelector('table');
-                    if (table) {
-                        const rows = table.rows;
-                        let newTableHtml = '<table class="admin-table">';
-                        // Update row/col inputs
-                        const rCount = rows.length;
-                        const cCount = rows[0] ? rows[0].cells.length : 0;
-                        setTimeout(() => {
-                            if (document.getElementById(`rows-${blockId}`)) document.getElementById(`rows-${blockId}`).value = rCount;
-                            if (document.getElementById(`cols-${blockId}`)) document.getElementById(`cols-${blockId}`).value = cCount;
-                        }, 0);
-
-                        for (let i = 0; i < rCount; i++) {
-                            newTableHtml += '<tr>';
-                            for (let j = 0; j < cCount; j++) {
-                                const cellText = rows[i].cells[j].innerText;
-                                newTableHtml += `<td><input type="text" placeholder="Data" value="${cellText.replace(/"/g, '&quot;')}"></td>`;
-                            }
-                            newTableHtml += '</tr>';
-                        }
-                        newTableHtml += '</table>';
-
-                        // We need to inject this into table-container
-                        // Use timeout to ensure DOM is ready
-                        setTimeout(() => {
-                            document.getElementById(`table-container-${blockId}`).innerHTML = newTableHtml;
-                        }, 0);
-                    }
-                }
-            }
-
-            window.generateTable = function (id) {
-                const rows = document.getElementById(`rows-${id}`).value;
-                const cols = document.getElementById(`cols-${id}`).value;
-                let html = '<table class="admin-table">';
-                for (let i = 0; i < rows; i++) {
-                    html += '<tr>';
-                    for (let j = 0; j < cols; j++) html += '<td><input type="text" placeholder="Data"></td>';
-                    html += '</tr>';
-                }
-                document.getElementById(`table-container-${id}`).innerHTML = html + '</table>';
             }
 
             // Populate Blocks
@@ -402,17 +367,11 @@
                     } else if (type === 'video') {
                         content = convertToEmbedUrl(el.querySelector('.block-input').value);
                     } else if (type === 'pdf') {
-                        content = el.querySelector('.block-input').value;
-                    } else if (type === 'table') {
-                        const rowEls = el.querySelectorAll('tr');
-                        // Save as pure HTML table for display
-                        let tableHTML = '<table border="1" style="width:100%">';
-                        rowEls.forEach(r => {
-                            tableHTML += '<tr>';
-                            r.querySelectorAll('input').forEach(i => tableHTML += `<td>${i.value}</td>`);
-                            tableHTML += '</tr>';
-                        });
-                        content = tableHTML + '</table>';
+                        content = convertToEmbedUrl(el.querySelector('.block-input').value);
+                    } else if (type === 'link') {
+                        const title = el.querySelector('.link-title').value;
+                        const url = el.querySelector('.link-url').value;
+                        content = JSON.stringify({ title, url });
                     }
 
                     contentArray.push({ type, content, order: index });

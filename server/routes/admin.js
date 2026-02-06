@@ -3,27 +3,38 @@ const router = express.Router();
 const { ensureStaff } = require('../middleware/checkRole');
 // Import all updated models
 const {
-    ArchiveItem, Institution, Emergency, Transport, Person,
-    Heritage, Narrative, TouristSpot, InteractiveMap, Organization, Occupation
+    ArchiveItem, History, Culture, NotablePerson, FreedomFighter,
+    MeritoriousStudent, HiddenTalent, Occupation, HeartbreakingStory,
+    SocialWork, InteractiveMap, Institution, Transport, Emergency, TouristSpot
 } = require('../models/ArchiveItem');
 
-// 1. Updated Model Map to include all 15+ types
+// 1. Updated Model Map to match the 14 Reformed categories
 const MODEL_MAP = {
-    'Institution': Institution,
-    'TouristSpot': TouristSpot,
-    'Emergency': Emergency,
-    'Transport': Transport,
-    'Person': Person,
-    'Heritage': Heritage,
-    'Narrative': Narrative,
-    'InteractiveMap': InteractiveMap,
-    'Organization': Organization,
-    'Occupation': Occupation,
-    'Social Work': Organization, // Map frontend category names to models
-    'Sopnotory Foundation': Organization,
-    'History': Heritage,
-    'Culture': Heritage,
-    'Heart Breaking Story': Narrative
+    'history': History,
+    'culture': Culture,
+    'institution': Institution,
+    'notable people': NotablePerson,
+    'freedom fighters': FreedomFighter,
+    'meritorious student': MeritoriousStudent,
+    'hidden talent': HiddenTalent,
+    'occupation': Occupation,
+    'Heartbreaking stories': HeartbreakingStory,
+    'tourist spots': TouristSpot,
+    'transport': Transport,
+    'Emergency services': Emergency,
+    'social works': SocialWork,
+    'interactive map': InteractiveMap,
+
+    // Slug-friendly aliases
+    'notable-people': NotablePerson,
+    'freedom-fighters': FreedomFighter,
+    'meritorious-student': MeritoriousStudent,
+    'hidden-talent': HiddenTalent,
+    'heartbreaking-stories': HeartbreakingStory,
+    'tourist-spots': TouristSpot,
+    'emergency-services': Emergency,
+    'social-works': SocialWork,
+    'interactive-map': InteractiveMap
 };
 
 // GET: Show the "Add Content" Page
@@ -37,6 +48,7 @@ router.get('/add', ensureStaff, (req, res) => {
 // POST: Save the new Content
 router.post('/add', ensureStaff, async (req, res) => {
     try {
+        console.log("DEBUG: Received Add Content Body:", req.body);
         const {
             title, slug, category, subType, thumbnail, bodyContentJSON, ...otherFields
         } = req.body;
@@ -44,13 +56,18 @@ router.post('/add', ensureStaff, async (req, res) => {
         // 1. Validate Category
         const SelectedModel = MODEL_MAP[category];
         if (!SelectedModel) {
+            console.error("DEBUG: Invalid Category:", category);
             throw new Error(`Invalid Category Selected: ${category}`);
         }
 
         // 2. Parse the Block Editor JSON
         let parsedBodyContent = [];
         if (bodyContentJSON) {
-            parsedBodyContent = JSON.parse(bodyContentJSON);
+            try {
+                parsedBodyContent = JSON.parse(bodyContentJSON);
+            } catch (pErr) {
+                console.error("DEBUG: JSON Parse Error:", pErr);
+            }
         }
 
         // 3. Prepare the data object
@@ -58,36 +75,51 @@ router.post('/add', ensureStaff, async (req, res) => {
             title,
             slug,
             category,
-            subType,
+            subType, // This satisfies Institution
             thumbnail,
-            status: 'published', // Always published, no draft option
+            status: 'published',
             author: req.user._id,
             bodyContent: parsedBodyContent,
             ...otherFields
         };
 
-        // 4. Special Handling: Coordinates for Interactive Map Points
+        // 4. Map Generic fields to Specific Discriminator fields
+        if (category === 'transport') itemData.transportType = subType;
+        if (category === 'Emergency services') itemData.serviceType = subType;
+
+        // 5. Normalizing coordinates
         if (otherFields.lat || otherFields.lng) {
-            itemData.coordinates = {
-                lat: parseFloat(otherFields.lat),
-                lng: parseFloat(otherFields.lng)
-            };
+            const lat = parseFloat(otherFields.lat);
+            const lng = parseFloat(otherFields.lng);
+            if (!isNaN(lat) && !isNaN(lng)) {
+                itemData.coordinates = { lat, lng };
+            }
         }
 
-        // 5. Special Handling: Normalize dates
-        if (otherFields.eventDate) itemData.eventDate = otherFields.eventDate;
-        if (otherFields.dateOfIncident) itemData.dateOfIncident = otherFields.dateOfIncident;
+        // 6. Normalizing dates
+        if (otherFields.eventDate) itemData.dateOfIncident = otherFields.eventDate;
+        if (otherFields.establishedDate) itemData.establishedDate = otherFields.establishedDate;
 
-        // 6. Create and Save
+        console.log("DEBUG: Final itemData to Save:", JSON.stringify(itemData, null, 2));
+
+        // 7. Create and Save
         const newItem = new SelectedModel(itemData);
         await newItem.save();
 
+        console.log("DEBUG: Save Successful!");
         req.flash('success_msg', `${category} entry created successfully!`);
         res.redirect('/admin/add');
 
     } catch (err) {
         console.error("SAVE ERROR:", err);
-        req.flash('error_msg', 'Error creating entry: ' + err.message);
+        let errorMsg = 'Error creating entry: ' + err.message;
+
+        // Specific handling for duplicate slug
+        if (err.code === 11000) {
+            errorMsg = 'Error: The Slug (URL Link) you provided already exists in the archive. Please provide a unique slug.';
+        }
+
+        req.flash('error_msg', errorMsg);
         res.redirect('/admin/add');
     }
 });
@@ -99,7 +131,11 @@ router.get('/edit/:id', ensureStaff, async (req, res) => {
         if (!item) {
             return res.status(404).send('Item not found');
         }
-        res.render('admin/edit-content/index', { item, user: req.user });
+        // Normalize subType for UI consistency
+        const itemObj = item.toObject();
+        itemObj.subType = item.subType || item.transportType || item.serviceType || '';
+
+        res.render('admin/edit-content/index', { item: itemObj, user: req.user });
     } catch (err) {
         console.error(err);
         res.status(500).send('Server Error');
@@ -109,19 +145,24 @@ router.get('/edit/:id', ensureStaff, async (req, res) => {
 // POST: Update Item
 router.post('/edit/:id', ensureStaff, async (req, res) => {
     try {
+        console.log("DEBUG: Received Edit Content Body:", req.body);
         const { title, slug, category, subType, thumbnail, bodyContentJSON, ...otherFields } = req.body;
-        console.log('DEBUG UPDATE locationLink:', otherFields.locationLink);
 
         // 1. Validate Category
         const SelectedModel = MODEL_MAP[category];
         if (!SelectedModel) {
+            console.error("DEBUG: Invalid Category:", category);
             throw new Error(`Invalid Category Selected: ${category}`);
         }
 
         // 2. Parse the Block Editor JSON
         let parsedBodyContent = [];
         if (bodyContentJSON) {
-            parsedBodyContent = JSON.parse(bodyContentJSON);
+            try {
+                parsedBodyContent = JSON.parse(bodyContentJSON);
+            } catch (pErr) {
+                console.error("DEBUG: JSON Parse Error:", pErr);
+            }
         }
 
         // 3. Prepare the data object
@@ -129,33 +170,60 @@ router.post('/edit/:id', ensureStaff, async (req, res) => {
             title,
             slug,
             category,
-            subType,
+            subType, // For Institution
             thumbnail,
             status: 'published',
             bodyContent: parsedBodyContent,
             ...otherFields
         };
 
-        // 4. Special Handling: Coordinates
+        // 4. Map Generic fields
+        if (category === 'transport') updateData.transportType = subType;
+        if (category === 'Emergency services') updateData.serviceType = subType;
+
+        // 5. Special Handling: Coordinates
         if (otherFields.lat || otherFields.lng) {
-            updateData.coordinates = {
-                lat: parseFloat(otherFields.lat),
-                lng: parseFloat(otherFields.lng)
-            };
+            const lat = parseFloat(otherFields.lat);
+            const lng = parseFloat(otherFields.lng);
+            if (!isNaN(lat) && !isNaN(lng)) {
+                updateData.coordinates = { lat, lng };
+            }
         }
 
-        if (otherFields.eventDate) updateData.eventDate = otherFields.eventDate;
-        if (otherFields.dateOfIncident) updateData.dateOfIncident = otherFields.dateOfIncident;
+        // 6. Normalizing dates
+        if (otherFields.eventDate) updateData.dateOfIncident = otherFields.eventDate;
+        if (otherFields.establishedDate) updateData.establishedDate = otherFields.establishedDate;
 
-        // 5. Update and Save
-        const updatedItem = await ArchiveItem.findByIdAndUpdate(req.params.id, updateData, { new: true });
+        console.log("DEBUG: Final updateData:", JSON.stringify(updateData, null, 2));
 
+        // 7. Update and Save
+        // FIX: Mongoose prevents changing the discriminator key (category) via standard findByIdAndUpdate/save.
+        // We check if it changed, and if so, update it directly in MongoDB collection first.
+        const currentItem = await ArchiveItem.findById(req.params.id);
+        if (currentItem && currentItem.category !== category) {
+            console.log(`DEBUG: Category change detected: ${currentItem.category} -> ${category}`);
+            await ArchiveItem.collection.updateOne(
+                { _id: currentItem._id },
+                { $set: { category: category } }
+            );
+        }
+
+        // Use { strict: false } to allow fields not in the BaseSchema (like transportType) to persist
+        const updatedItem = await ArchiveItem.findByIdAndUpdate(req.params.id, updateData, { new: true, strict: false });
+
+        console.log("DEBUG: Update Successful!");
         req.flash('success_msg', 'Entry updated successfully!');
         res.redirect(`/entry/${updatedItem.slug}`);
 
     } catch (err) {
         console.error("UPDATE ERROR:", err);
-        req.flash('error_msg', 'Error updating entry: ' + err.message);
+        let errorMsg = 'Error updating entry: ' + err.message;
+
+        if (err.code === 11000) {
+            errorMsg = 'Error: The Slug (URL Link) you provided already exists. Slugs must be unique across the archive.';
+        }
+
+        req.flash('error_msg', errorMsg);
         res.redirect(`/admin/edit/${req.params.id}`);
     }
 });

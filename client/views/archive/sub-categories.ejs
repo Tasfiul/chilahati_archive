@@ -31,13 +31,14 @@
                 <% subTypes.forEach(sub=> {
                     const slug = String(sub).toLowerCase().replace(/\s+/g,'-').replace(/[^a-z0-9-]/g,'');
                     %>
-                    <a href="/archive/<%= category %>/<%= sub %>" class="card card-subtype card-<%= slug %>">
+                    <a href="/archive/<%= category.replace(/\s+/g, '-') %>/<%= sub %>"
+                        class="card card-subtype card-<%= slug %>">
                         <div class="card-content">
                             <div class="card-icon"><i class="fas fa-folder-open"></i></div>
-                            <h3>
+                            <h3 style="text-transform: capitalize;">
                                 <%= sub %>
                             </h3>
-                            <p>View all entries under <%= sub %>
+                            <p style="text-transform: capitalize;">View all entries under <%= sub %>
                                     <%= category %>
                             </p>
                         </div>

@@ -27,13 +27,15 @@
                 <!-- LEFT SIDE: Main Content -->
                 <article class="content-area">
                     <header class="entry-header">
-                        <nav class="breadcrumb">
-                            <a href="/archive/<%= item.category %>">
+                        <nav class="breadcrumb" style="text-transform: capitalize;">
+                            <a href="/archive/<%= item.category.replace(/\s+/g, '-') %>">
                                 <%= item.category %>
-                            </a> /
-                            <a href="/archive/<%= item.category %>/<%= item.subType %>">
-                                <%= item.subType %>
                             </a>
+                            <% if (item.subType) { %>
+                                / <a href="/archive/<%= item.category.replace(/\s+/g, '-') %>/<%= item.subType %>">
+                                    <%= item.subType %>
+                                </a>
+                                <% } %>
                         </nav>
                         <h1>
                             <%= item.title %>
@@ -81,9 +83,14 @@
                                                         allowfullscreen></iframe>
                                             </div>
 
-                                            <% } else if (block.type==='table' ) { %>
-                                                <div class="block-table">
-                                                    <%- block.content %>
+                                            <% } else if (block.type==='link' ) { let linkData={ title: 'Open Link' ,
+                                                url: '#' }; try { linkData=JSON.parse(block.content); } catch(e) {
+                                                linkData.url=block.content; } %>
+                                                <div class="block-link">
+                                                    <a href="<%= linkData.url %>" target="_blank" class="external-link">
+                                                        <i class="fas fa-link"></i>
+                                                        <%= linkData.title %>
+                                                    </a>
                                                 </div>
 
                                                 <% } else if (block.type==='pdf' ) { %>
@@ -132,58 +139,60 @@
                             <table class="infobox-table">
                                 <tr>
                                     <th>Category</th>
-                                    <td>
+                                    <td style="text-transform: capitalize;">
                                         <%= item.category %>
                                     </td>
                                 </tr>
-                                <tr>
-                                    <th>Sub-type</th>
-                                    <td>
-                                        <%= item.subType %>
-                                    </td>
-                                </tr>
-
-                                <!-- Specific Fields -->
-                                <% if (item.establishedDate) { %>
+                                <% if (item.subType) { %>
                                     <tr>
-                                        <th>Established</th>
-                                        <td>
-                                            <%= new Date(item.establishedDate).getFullYear() %>
+                                        <th>Sub-type</th>
+                                        <td style="text-transform: capitalize;">
+                                            <%= item.subType %>
                                         </td>
                                     </tr>
                                     <% } %>
-                                        <% if (item.headOfInstitution) { %>
+
+                                        <!-- Specific Fields -->
+                                        <% if (item.establishedDate) { %>
                                             <tr>
-                                                <th>Head</th>
+                                                <th>Established</th>
                                                 <td>
-                                                    <%= item.headOfInstitution %>
+                                                    <%= new Date(item.establishedDate).getFullYear() %>
                                                 </td>
                                             </tr>
                                             <% } %>
-                                                <% if (item.profession) { %>
+                                                <% if (item.headOfInstitution) { %>
                                                     <tr>
-                                                        <th>Profession</th>
+                                                        <th>Head</th>
                                                         <td>
-                                                            <%= item.profession %>
+                                                            <%= item.headOfInstitution %>
                                                         </td>
                                                     </tr>
                                                     <% } %>
-                                                        <% if (item.sectorNo) { %>
+                                                        <% if (item.profession) { %>
                                                             <tr>
-                                                                <th>Sector</th>
+                                                                <th>Profession</th>
                                                                 <td>
-                                                                    <%= item.sectorNo %>
+                                                                    <%= item.profession %>
                                                                 </td>
                                                             </tr>
                                                             <% } %>
-                                                                <% if (item.address) { %>
+                                                                <% if (item.sectorNo) { %>
                                                                     <tr>
-                                                                        <th>Address</th>
+                                                                        <th>Sector</th>
                                                                         <td>
-                                                                            <%= item.address %>
+                                                                            <%= item.sectorNo %>
                                                                         </td>
                                                                     </tr>
                                                                     <% } %>
+                                                                        <% if (item.address) { %>
+                                                                            <tr>
+                                                                                <th>Address</th>
+                                                                                <td>
+                                                                                    <%= item.address %>
+                                                                                </td>
+                                                                            </tr>
+                                                                            <% } %>
                             </table>
 
                             <% if (item.locationLink) { let mapUrl=item.locationLink.trim(); if

@@ -22,19 +22,19 @@
 
         <div class="main-content">
             <header style="margin-bottom: 2rem;">
-                <nav style="margin-bottom: 10px; font-size: 0.9rem; opacity: 0.7;">
-                    <a href="/" style="color: white;">Home</a> /
-                    <a href="/archive/<%= category %>" style="color: white;">
+                <nav style="margin-bottom: 10px; font-size: 0.9rem; opacity: 0.7; text-transform: capitalize;">
+                    <a href="/" style="color: white; text-transform: none;">Home</a> /
+                    <a href="/archive/<%= category.replace(/\s+/g, '-') %>" style="color: white;">
                         <%= category %>
                     </a>
                     <% if (typeof subType !=='undefined' && subType) { %>
-                        / <a href="/archive/<%= category %>/<%= subType %>" style="color: white;">
+                        / <a href="/archive/<%= category.replace(/\s+/g, '-') %>/<%= subType %>" style="color: white;">
                             <%= subType %>
                         </a>
                         <% } %>
                 </nav>
 
-                <h1>
+                <h1 style="text-transform: capitalize;">
                     <%= typeof title !=='undefined' ? title : category %>
                 </h1>
                 <p>
@@ -61,7 +61,7 @@
                                                 <%= item.title %>
                                             </h3>
                                             <p class="item-excerpt">Click to read the full archive...</p>
-                                            <div class="item-meta">
+                                            <div class="item-meta" style="text-transform: capitalize;">
                                                 <span class="badge">
                                                     <%= item.category %>
                                                 </span>

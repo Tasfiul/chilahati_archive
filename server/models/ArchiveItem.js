@@ -4,7 +4,7 @@ const mongoose = require('mongoose');
 const contentBlockSchema = new mongoose.Schema({
     type: {
         type: String,
-        enum: ['paragraph', 'heading', 'image', 'list', 'table', 'pdf', 'video', 'quote'],
+        enum: ['paragraph', 'heading', 'image', 'list', 'table', 'pdf', 'video', 'quote', 'link'],
         required: true
     },
     content: mongoose.Schema.Types.Mixed,
@@ -28,6 +28,7 @@ const BaseSchema = new mongoose.Schema({
         default: 'draft'
     },
     author: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+    category: { type: String, required: true, index: true }, // Explicitly defined for better builder support
     bodyContent: [contentBlockSchema],
     tags: [String] // Helpful for filtering across categories
 }, baseOptions);
@@ -48,97 +49,93 @@ const LocationSchema = {
     contactPhone: { type: String }
 };
 
-// --- 4. THE DISCRIMINATORS (The Specific Types) ---
-
-// A. INSTITUTIONS & SERVICES
-const Institution = ArchiveItem.discriminator('Institution', new mongoose.Schema({
-    ...LocationSchema,
-    subType: { type: String, enum: ['Educational', 'Governmental', 'Financial', 'Religious', 'Health', 'Other'] },
-    establishedDate: { type: Date },
-    headOfInstitution: { type: String }
-}));
-
-const Emergency = ArchiveItem.discriminator('Emergency', new mongoose.Schema({
-    ...LocationSchema,
-    serviceType: { type: String, enum: ['Health', 'Police', 'Fire', 'Ambulance'] },
-    is24Hours: { type: Boolean, default: true }
-}));
-
-const Transport = ArchiveItem.discriminator('Transport', new mongoose.Schema({
-    ...LocationSchema,
-    transportType: { type: String, enum: ['Bus', 'Train', 'Auto-Stand', 'Launch-Ghat'] },
-    destinations: [String]
-}));
-
-// B. PEOPLE (Freedom Fighters, Students, Notable, Talent)
-const Person = ArchiveItem.discriminator('Person', new mongoose.Schema({
-    personType: {
-        type: String,
-        enum: ['Notable People', 'Freedom Fighter', 'Meritorious Student', 'Hidden Talent', 'Scholar']
-    },
+const PersonFields = {
     dateOfBirth: { type: Date },
     dateOfDeath: { type: Date },
     education: { type: String },
     achievements: [String],
-    // Specific to Freedom Fighters
-    sectorNo: { type: String },
-    // Specific to Students
-    passingYear: { type: Number },
-    currentStatus: { type: String } // e.g., "Studying at DU"
-}));
+    sectorNo: { type: String }, // Specific to Freedom Fighters
+    passingYear: { type: Number }, // Specific to Students
+    currentStatus: { type: String }, // e.g., "Studying at DU"
+    profession: { type: String }
+};
 
-// C. STORIES & CULTURE
-const Heritage = ArchiveItem.discriminator('Heritage', new mongoose.Schema({
-    heritageType: { type: String, enum: ['History', 'Culture', 'Occupation'] },
+const HeritageFields = {
     period: { type: String }, // e.g. "British Era", "1971"
     significance: { type: String }
-}));
+};
 
-const Narrative = ArchiveItem.discriminator('Narrative', new mongoose.Schema({
-    narrativeType: { type: String, enum: ['Heart Breaking Story', 'Local Legend', 'Success Story'] },
+const NarrativeFields = {
     dateOfIncident: { type: Date },
     involvedParties: [String]
+};
+
+const OccupationFields = {
+    traditionalName: { type: String }, // e.g. "Kumar", "Kamars"
+    toolsUsed: [String],
+    occupationStatus: { type: String, enum: ['Thriving', 'Declining', 'Extinct'] }
+};
+
+const OrgFields = {
+    foundedBy: { type: String },
+    missionStatement: { type: String }
+};
+
+// --- 4. THE DISCRIMINATORS (The Specific Types) ---
+
+// A. SIMPLE CATEGORIES (No sub-category)
+const History = ArchiveItem.discriminator('history', new mongoose.Schema({ ...HeritageFields }));
+const Culture = ArchiveItem.discriminator('culture', new mongoose.Schema({ ...HeritageFields }));
+const NotablePerson = ArchiveItem.discriminator('notable people', new mongoose.Schema({ ...PersonFields }));
+const FreedomFighter = ArchiveItem.discriminator('freedom fighters', new mongoose.Schema({ ...PersonFields }));
+const MeritoriousStudent = ArchiveItem.discriminator('meritorious student', new mongoose.Schema({ ...PersonFields }));
+const HiddenTalent = ArchiveItem.discriminator('hidden talent', new mongoose.Schema({ ...PersonFields }));
+const Occupation = ArchiveItem.discriminator('occupation', new mongoose.Schema({ ...HeritageFields, ...OccupationFields }));
+const HeartbreakingStory = ArchiveItem.discriminator('Heartbreaking stories', new mongoose.Schema({ ...NarrativeFields }));
+const SocialWork = ArchiveItem.discriminator('social works', new mongoose.Schema({ ...LocationSchema, ...OrgFields }));
+const InteractiveMap = ArchiveItem.discriminator('interactive map', new mongoose.Schema({ ...LocationSchema, markerIcon: String, mapType: String }));
+
+// B. CATEGORIES WITH SUB-CATEGORIES
+const Institution = ArchiveItem.discriminator('institution', new mongoose.Schema({
+    ...LocationSchema,
+    subType: { type: String, enum: ['educational', 'governmental', 'Banks', 'Religious', 'other'] },
+    establishedDate: { type: Date },
+    headOfInstitution: { type: String }
 }));
 
-// D. PLACES & INTERACTIVE MAPS
-const TouristSpot = ArchiveItem.discriminator('TouristSpot', new mongoose.Schema({
+const Transport = ArchiveItem.discriminator('transport', new mongoose.Schema({
+    ...LocationSchema,
+    transportType: { type: String, enum: ['bus', 'train', 'auto stand', 'launch-ghat'] },
+    destinations: [String]
+}));
+
+const Emergency = ArchiveItem.discriminator('Emergency services', new mongoose.Schema({
+    ...LocationSchema,
+    serviceType: { type: String, enum: ['hospitals', 'police', 'fire'] },
+    is24Hours: { type: Boolean, default: true }
+}));
+
+const TouristSpot = ArchiveItem.discriminator('tourist spots', new mongoose.Schema({
     ...LocationSchema,
     entryFee: { type: String },
     bestTimeToVisit: { type: String }
 }));
 
-const InteractiveMap = ArchiveItem.discriminator('InteractiveMap', new mongoose.Schema({
-    ...LocationSchema,
-    mapType: { type: String, enum: ['Historical Site', 'Boundary', 'Utility Services'] },
-    markerIcon: { type: String } // Custom icon for the map
-}));
-
-// E. ORGANIZATIONS (Social Work, Sopnotory Foundation)
-const Organization = ArchiveItem.discriminator('Organization', new mongoose.Schema({
-    ...LocationSchema,
-    orgType: { type: String, enum: ['Social Work', 'Sopnotory Foundation', 'NGO', 'Club'] },
-    foundedBy: { type: String },
-    missionStatement: { type: String }
-}));
-
-// F. OCCUPATION (Special focus on local traditional jobs)
-const Occupation = ArchiveItem.discriminator('Occupation', new mongoose.Schema({
-    traditionalName: { type: String }, // e.g. "Kumar", "Kamars"
-    toolsUsed: [String],
-    currentStatus: { type: String, enum: ['Thriving', 'Declining', 'Extinct'] }
-}));
-
 
 module.exports = {
     ArchiveItem,
-    Institution,
-    Emergency,
-    Transport,
-    Person,
-    Heritage,
-    Narrative,
-    TouristSpot,
+    History,
+    Culture,
+    NotablePerson,
+    FreedomFighter,
+    MeritoriousStudent,
+    HiddenTalent,
+    Occupation,
+    HeartbreakingStory,
+    SocialWork,
     InteractiveMap,
-    Organization,
-    Occupation
+    Institution,
+    Transport,
+    Emergency,
+    TouristSpot
 };
