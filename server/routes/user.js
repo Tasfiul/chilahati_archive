@@ -195,16 +195,19 @@ router.post('/forgot-password', async (req, res) => {
 
         const resetLink = `${process.env.BASE_URL}/reset-password/${resetToken}`;
         const mailOptions = {
-            from: process.env.EMAIL_USER,
+            from: `"Chilahati Archive Admin" <${process.env.EMAIL_USER}>`,
             to: email,
-            subject: 'Password Reset - Chilahati Archive',
+            replyTo: process.env.EMAIL_USER,
+            priority: 'high',
+            subject: 'Reset your Chilahati Archive password',
+            text: `Hi,\n\nYou requested a password reset for your Chilahati Archive account.\n\nPlease reset your password here: ${resetLink}\n\nThis link is valid for 1 hour.\n\nIf you didn't request this, you can safely ignore this email.\n\nBest regards,\nThe Chilahati Archive Team`,
             html: `
-                <h3>Password Reset Request</h3>
-                <p>You requested to reset your password for your Chilahati Archive account.</p>
-                <p>Click the link below to reset your password:</p>
-                <a href="${resetLink}">Reset My Password</a>
-                <p>This link will expire in 1 hour.</p>
-                <p><strong>Security Notice:</strong> If you didn't request this, please ignore this email.</p>
+                <p>Hi,</p>
+                <p>You requested a password reset for your Chilahati Archive account.</p>
+                <p>Please <strong><a href="${resetLink}">click here to reset your password</a></strong>.</p>
+                <p>This link is valid for 1 hour.</p>
+                <p>If you didn't request this, you can safely ignore this email.</p>
+                <p>Best regards,<br>The Chilahati Archive Team</p>
             `
         };
 
@@ -228,6 +231,63 @@ router.post('/forgot-password', async (req, res) => {
         } else {
             res.redirect('/forgot-password');
         }
+    }
+});
+
+// GET: Contribute Page
+router.get('/contribute', ensureAuthenticated, (req, res) => {
+    res.render('user/contribute', {
+        user: req.user
+    });
+});
+
+// POST: Handle Contribution Message
+router.post('/contribute', ensureAuthenticated, async (req, res) => {
+    try {
+        const { message } = req.body;
+        const userEmail = req.user.email;
+        const username = req.user.username;
+
+        if (!message || message.trim().length === 0) {
+            req.flash('error_msg', 'Please enter a message before sending.');
+            return res.redirect('/contribute');
+        }
+
+        // Email Configuration
+        const nodemailer = require('nodemailer');
+        const transporter = nodemailer.createTransport({
+            service: 'gmail',
+            auth: {
+                user: process.env.EMAIL_USER,
+                pass: process.env.EMAIL_PASS
+            }
+        });
+
+        const mailOptions = {
+            from: `"Archive Contributor" <${process.env.EMAIL_USER}>`,
+            to: process.env.CONTRIBUTE_RECEIVER_EMAIL,
+            replyTo: userEmail,
+            priority: 'high',
+            subject: `Message from ${username} (${userEmail})`,
+            text: `Account: ${username}\nEmail: ${userEmail}\n\nMessage:\n${message}\n\n--- end of message ---`,
+            html: `
+                <p><strong>Contributor:</strong> ${username} (${userEmail})</p>
+                <p><strong>Message:</strong></p>
+                <p>${message.replace(/\n/g, '<br>')}</p>
+                <hr>
+                <p><small>This message was sent via the Chilahati Archive contribution form.</small></p>
+            `
+        };
+
+        await transporter.sendMail(mailOptions);
+
+        req.flash('success_msg', 'Thank you! Your message has been sent to our team.');
+        res.redirect('/contribute');
+
+    } catch (err) {
+        console.error('Error sending contribution email:', err);
+        req.flash('error_msg', 'An error occurred while sending your message. Please try again later.');
+        res.redirect('/contribute');
     }
 });
 

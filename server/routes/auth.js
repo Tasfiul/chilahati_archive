@@ -1,9 +1,9 @@
 const express = require('express');
-const router = express.Router(); 
+const router = express.Router();
 const bcrypt = require('bcryptjs');
 const crypto = require('crypto');
 const nodemailer = require('nodemailer');
-const User = require('../models/User'); 
+const User = require('../models/User');
 const passport = require('passport');
 
 // --- EMAIL CONFIGURATION ---
@@ -27,7 +27,7 @@ router.post('/login', (req, res, next) => {
     passport.authenticate('local', {
         successRedirect: '/',       // Where to go if login works
         failureRedirect: '/login',  // Where to go if login fails
-        failureFlash: true      
+        failureFlash: true
     })(req, res, next);
 });
 
@@ -69,13 +69,16 @@ router.post('/register', async (req, res) => {
         // Send Email
         const verificationLink = `${process.env.BASE_URL}/verify/${token}`;
         const mailOptions = {
-            from: process.env.EMAIL_USER,
+            from: `"Chilahati Archive Admin" <${process.env.EMAIL_USER}>`,
             to: email,
-            subject: 'Verify your Chilahati Archive Account',
+            replyTo: process.env.EMAIL_USER,
+            priority: 'high',
+            subject: 'Confirm your Chilahati Archive account',
+            text: `Hi,\n\nWelcome to Chilahati Archive! Please verify your account by clicking the link below:\n\nVerification link: ${verificationLink}\n\nBest regards,\nThe Chilahati Archive Team`,
             html: `
-                <h3>Welcome to Chilahati Archive!</h3>
-                <p>Please click the link below to verify your account:</p>
-                <a href="${verificationLink}">Verify My Account</a>
+                <p>Hi,</p>
+                <p>Welcome to Chilahati Archive! Please verify your account by <strong><a href="${verificationLink}">clicking here</a></strong>.</p>
+                <p>Best regards,<br>The Chilahati Archive Team</p>
             `
         };
 

@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contribute - Chilahati Archive</title>
+    <!-- Fonts & Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/contribute.css">
+</head>
+
+<body>
+
+    <%- include('../partials/navbar') %>
+
+        <div class="container">
+            <div class="contribute-card">
+                <div class="contribute-header">
+                    <h2><i class="fas fa-hand-holding-heart"></i> Contribute</h2>
+                    <p>Share your stories, information, or feedback to help us build a better archive for Chilahati.</p>
+                </div>
+
+                <!-- Flash Messages -->
+                <% if (locals.success_msg && success_msg.length> 0) { %>
+                    <div class="alert alert-success">
+                        <i class="fas fa-check-circle"></i>
+                        <%= success_msg %>
+                    </div>
+                    <% } %>
+
+                        <% if (locals.error_msg && error_msg.length> 0) { %>
+                            <div class="alert alert-error">
+                                <i class="fas fa-exclamation-circle"></i>
+                                <%= error_msg %>
+                            </div>
+                            <% } %>
+
+                                <form action="/contribute" method="POST">
+                                    <div class="form-group">
+                                        <label for="message">Your Message</label>
+                                        <textarea id="message" name="message" class="message-area"
+                                            placeholder="Type your information or contribution here..."
+                                            required></textarea>
+                                    </div>
+
+                                    <button type="submit" class="submit-btn text-white">
+                                        <i class="fas fa-paper-plane"></i> Send Message
+                                    </button>
+                                </form>
+
+                                <div class="contribute-footer">
+                                    <p>Thank you for being a part of this community, <strong>
+                                            <%= user.username %>
+                                        </strong>!</p>
+                                </div>
+            </div>
+        </div>
+
+        <%- include('../partials/footer') %>
+</body>
+
+</html>
