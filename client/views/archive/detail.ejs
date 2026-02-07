@@ -143,29 +143,32 @@
                                         <%= item.category %>
                                     </td>
                                 </tr>
-                                <% if (item.subType) { %>
+                                <% let subTypeVal=item.subType || item.transportType || item.serviceType; if
+                                    (subTypeVal) { %>
                                     <tr>
                                         <th>Sub-type</th>
                                         <td style="text-transform: capitalize;">
-                                            <%= item.subType %>
+                                            <%= subTypeVal %>
                                         </td>
                                     </tr>
                                     <% } %>
 
-                                        <!-- Specific Fields -->
-                                        <% if (item.establishedDate) { %>
+                                        <!-- A. PERSONAL FIELDS -->
+                                        <% if (item.dateOfBirth) { %>
                                             <tr>
-                                                <th>Established</th>
+                                                <th>Birth</th>
                                                 <td>
-                                                    <%= new Date(item.establishedDate).getFullYear() %>
+                                                    <%= new Date(item.dateOfBirth).toLocaleDateString('en-GB', {
+                                                        day: 'numeric' , month: 'short' , year: 'numeric' }) %>
                                                 </td>
                                             </tr>
                                             <% } %>
-                                                <% if (item.headOfInstitution) { %>
+                                                <% if (item.dateOfDeath) { %>
                                                     <tr>
-                                                        <th>Head</th>
+                                                        <th>Death</th>
                                                         <td>
-                                                            <%= item.headOfInstitution %>
+                                                            <%= new Date(item.dateOfDeath).toLocaleDateString('en-GB', {
+                                                                day: 'numeric' , month: 'short' , year: 'numeric' }) %>
                                                         </td>
                                                     </tr>
                                                     <% } %>
@@ -177,22 +180,266 @@
                                                                 </td>
                                                             </tr>
                                                             <% } %>
-                                                                <% if (item.sectorNo) { %>
+                                                                <% if (item.education) { %>
                                                                     <tr>
-                                                                        <th>Sector</th>
+                                                                        <th>Education</th>
                                                                         <td>
-                                                                            <%= item.sectorNo %>
+                                                                            <%= item.education %>
                                                                         </td>
                                                                     </tr>
                                                                     <% } %>
-                                                                        <% if (item.address) { %>
+                                                                        <% if (item.passingYear) { %>
                                                                             <tr>
-                                                                                <th>Address</th>
+                                                                                <th>Passing Year</th>
                                                                                 <td>
-                                                                                    <%= item.address %>
+                                                                                    <%= item.passingYear %>
                                                                                 </td>
                                                                             </tr>
                                                                             <% } %>
+                                                                                <% if (item.currentStatus) { %>
+                                                                                    <tr>
+                                                                                        <th>Status</th>
+                                                                                        <td>
+                                                                                            <%= item.currentStatus %>
+                                                                                        </td>
+                                                                                    </tr>
+                                                                                    <% } %>
+                                                                                        <% if (item.achievements &&
+                                                                                            item.achievements.length> 0)
+                                                                                            { %>
+                                                                                            <tr>
+                                                                                                <th>Achievements</th>
+                                                                                                <td>
+                                                                                                    <ul
+                                                                                                        style="margin:0; padding-left: 15px; font-size: 0.9em;">
+                                                                                                        <%
+                                                                                                            item.achievements.forEach(a=>
+                                                                                                            { %>
+                                                                                                            <li>
+                                                                                                                <%= a %>
+                                                                                                            </li>
+                                                                                                            <% }) %>
+                                                                                                    </ul>
+                                                                                                </td>
+                                                                                            </tr>
+                                                                                            <% } %>
+                                                                                                <% if (item.sectorNo) {
+                                                                                                    %>
+                                                                                                    <tr>
+                                                                                                        <th>Sector No
+                                                                                                        </th>
+                                                                                                        <td>
+                                                                                                            <%= item.sectorNo
+                                                                                                                %>
+                                                                                                        </td>
+                                                                                                    </tr>
+                                                                                                    <% } %>
+
+                                                                                                        <!-- B. HERITAGE / OCCUPATION / NARRATIVE -->
+                                                                                                        <% if
+                                                                                                            (item.period)
+                                                                                                            { %>
+                                                                                                            <tr>
+                                                                                                                <th>Period
+                                                                                                                </th>
+                                                                                                                <td>
+                                                                                                                    <%= item.period
+                                                                                                                        %>
+                                                                                                                </td>
+                                                                                                            </tr>
+                                                                                                            <% } %>
+                                                                                                                <% if
+                                                                                                                    (item.establishedDate)
+                                                                                                                    { %>
+                                                                                                                    <tr>
+                                                                                                                        <th>Established
+                                                                                                                        </th>
+                                                                                                                        <td>
+                                                                                                                            <%= new
+                                                                                                                                Date(item.establishedDate).getFullYear()
+                                                                                                                                %>
+                                                                                                                        </td>
+                                                                                                                    </tr>
+                                                                                                                    <% }
+                                                                                                                        %>
+                                                                                                                        <% if
+                                                                                                                            (item.significance)
+                                                                                                                            {
+                                                                                                                            %>
+                                                                                                                            <tr>
+                                                                                                                                <th>Significance
+                                                                                                                                </th>
+                                                                                                                                <td>
+                                                                                                                                    <%= item.significance
+                                                                                                                                        %>
+                                                                                                                                </td>
+                                                                                                                            </tr>
+                                                                                                                            <% }
+                                                                                                                                %>
+                                                                                                                                <% if
+                                                                                                                                    (item.traditionalName)
+                                                                                                                                    {
+                                                                                                                                    %>
+                                                                                                                                    <tr>
+                                                                                                                                        <th>Traditional
+                                                                                                                                            Name
+                                                                                                                                        </th>
+                                                                                                                                        <td>
+                                                                                                                                            <%= item.traditionalName
+                                                                                                                                                %>
+                                                                                                                                        </td>
+                                                                                                                                    </tr>
+                                                                                                                                    <% }
+                                                                                                                                        %>
+                                                                                                                                        <% let
+                                                                                                                                            incidentDate=item.dateOfIncident;
+                                                                                                                                            if
+                                                                                                                                            (incidentDate)
+                                                                                                                                            {
+                                                                                                                                            %>
+                                                                                                                                            <tr>
+                                                                                                                                                <th>Date
+                                                                                                                                                    of
+                                                                                                                                                    Incident
+                                                                                                                                                </th>
+                                                                                                                                                <td>
+                                                                                                                                                    <%= new
+                                                                                                                                                        Date(incidentDate).toLocaleDateString('en-GB')
+                                                                                                                                                        %>
+                                                                                                                                                </td>
+                                                                                                                                            </tr>
+                                                                                                                                            <% }
+                                                                                                                                                %>
+                                                                                                                                                <% if
+                                                                                                                                                    (item.toolsUsed
+                                                                                                                                                    &&
+                                                                                                                                                    item.toolsUsed.length>
+                                                                                                                                                    0)
+                                                                                                                                                    {
+                                                                                                                                                    %>
+                                                                                                                                                    <tr>
+                                                                                                                                                        <th>Tools
+                                                                                                                                                            Used
+                                                                                                                                                        </th>
+                                                                                                                                                        <td>
+                                                                                                                                                            <%= item.toolsUsed.join(', ') %>
+                                    </td>
+                                </tr>
+                                <% } %>
+                                <% if (item.occupationStatus) { %>
+                                <tr>
+                                    <th>Current Status</th>
+                                    <td>
+                                        <span class="status-badge"><%= item.occupationStatus %></span>
+                                    </td>
+                                </tr>
+                                <% } %>
+                                <% if (item.involvedParties && item.involvedParties.length > 0) { %>
+                                <tr>
+                                    <th>Involved Parties</th>
+                                    <td>
+                                        <%= item.involvedParties.join(' , ') %>
+                                    </td>
+                                </tr>
+                                <% } %>
+
+                                <!-- C. ORGANIZATIONAL -->
+                                <% if (item.foundedBy) { %>
+                                <tr>
+                                    <th>Founded By</th>
+                                    <td>
+                                        <%= item.foundedBy %>
+                                    </td>
+                                </tr>
+                                <% } %>
+                                <% if (item.headOfInstitution) { %>
+                                <tr>
+                                    <th>Current Head</th>
+                                    <td>
+                                        <%= item.headOfInstitution %>
+                                    </td>
+                                </tr>
+                                <% } %>
+                                <% if (item.missionStatement) { %>
+                                <tr>
+                                    <th>Mission</th>
+                                    <td>
+                                        <div style="font-size: 0.85em; font-style: italic;">"<%= item.missionStatement %>"</div>
+                                    </td>
+                                </tr>
+                                <% } %>
+
+                                <!-- D. GEOGRAPHIC / SERVICE -->
+                                <% if (item.address) { %>
+                                <tr>
+                                    <th>Address</th>
+                                    <td>
+                                        <%= item.address %>
+                                    </td>
+                                </tr>
+                                <% } %>
+                                <% if (item.contactPhone) { %>
+                                <tr>
+                                    <th>Contact</th>
+                                    <td>
+                                        <%= item.contactPhone %>
+                                    </td>
+                                </tr>
+                                <% } %>
+                                <% if (item.destinations && item.destinations.length > 0) { %>
+                                <tr>
+                                    <th>Destinations</th>
+                                    <td>
+                                        <%= item.destinations.join(' , ') %>
+                                    </td>
+                                </tr>
+                                <% } %>
+                                <% if (item.category === ' Emergency services' && typeof item.is24Hours !=='undefined' ) { %>
+                                                                                                                                                    <tr>
+                                                                                                                                                        <th>24/7
+                                                                                                                                                            Service
+                                                                                                                                                        </th>
+                                                                                                                                                        <td>
+                                                                                                                                                            <%= item.is24Hours
+                                                                                                                                                                ? 'Yes'
+                                                                                                                                                                : 'No'
+                                                                                                                                                                %>
+                                                                                                                                                        </td>
+                                                                                                                                                    </tr>
+                                                                                                                                                    <% }
+                                                                                                                                                        %>
+                                                                                                                                                        <% if
+                                                                                                                                                            (item.entryFee)
+                                                                                                                                                            {
+                                                                                                                                                            %>
+                                                                                                                                                            <tr>
+                                                                                                                                                                <th>Entry
+                                                                                                                                                                    Fee
+                                                                                                                                                                </th>
+                                                                                                                                                                <td>
+                                                                                                                                                                    <%= item.entryFee
+                                                                                                                                                                        %>
+                                                                                                                                                                </td>
+                                                                                                                                                            </tr>
+                                                                                                                                                            <% }
+                                                                                                                                                                %>
+                                                                                                                                                                <% if
+                                                                                                                                                                    (item.bestTimeToVisit)
+                                                                                                                                                                    {
+                                                                                                                                                                    %>
+                                                                                                                                                                    <tr>
+                                                                                                                                                                        <th>Best
+                                                                                                                                                                            Time
+                                                                                                                                                                            to
+                                                                                                                                                                            Visit
+                                                                                                                                                                        </th>
+                                                                                                                                                                        <td>
+                                                                                                                                                                            <%= item.bestTimeToVisit
+                                                                                                                                                                                %>
+                                                                                                                                                                        </td>
+                                                                                                                                                                    </tr>
+                                                                                                                                                                    <% }
+                                                                                                                                                                        %>
                             </table>
 
                             <% if (item.locationLink) { let mapUrl=item.locationLink.trim(); if
