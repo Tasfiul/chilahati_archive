@@ -104,6 +104,12 @@ textarea:focus {
     margin-top: 5px;
 }
 
+.block-item[data-type="heading"] .block-input {
+    font-size: 1.6rem;
+    font-weight: 600;
+    color: #ffda79;
+}
+
 .block-caption {
     margin-top: 5px;
     font-size: 0.9rem;
@@ -216,6 +222,7 @@ textarea:focus {
     background: #c0392b;
     transform: translateY(-2px);
 }
+
 /* Alert Messages */
 .alert {
     padding: 15px 20px;
@@ -239,6 +246,13 @@ textarea:focus {
 }
 
 @keyframes alertSlideDown {
-    from { opacity: 0; transform: translateY(-10px); }
-    to { opacity: 1; transform: translateY(0); }
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
