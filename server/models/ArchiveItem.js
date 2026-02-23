@@ -79,8 +79,8 @@ const OrgFields = {
 // --- 4. THE DISCRIMINATORS (The Specific Types) ---
 
 // A. SIMPLE CATEGORIES (No sub-category)
-const History = ArchiveItem.discriminator('history', new mongoose.Schema({ ...HeritageFields }));
-const Culture = ArchiveItem.discriminator('culture', new mongoose.Schema({ ...HeritageFields }));
+const History = ArchiveItem.discriminator('history', new mongoose.Schema({ ...HeritageFields, ...NarrativeFields }));
+const Culture = ArchiveItem.discriminator('culture', new mongoose.Schema({ ...HeritageFields, ...NarrativeFields }));
 const NotablePerson = ArchiveItem.discriminator('notable people', new mongoose.Schema({ ...PersonFields }));
 const FreedomFighter = ArchiveItem.discriminator('freedom fighters', new mongoose.Schema({ ...PersonFields }));
 const MeritoriousStudent = ArchiveItem.discriminator('meritorious student', new mongoose.Schema({ ...PersonFields }));

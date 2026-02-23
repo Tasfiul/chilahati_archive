@@ -43,15 +43,48 @@ router.get('/add', ensureStaff, (req, res) => {
     });
 });
 
-// GET: Content Management Page
+// GET: Content Management Page (with pagination and search)
 router.get('/content-management', ensureStaff, async (req, res) => {
     try {
-        // Fetch all items submitted by the current user
-        const items = await ArchiveItem.find({ author: req.user._id }).sort({ createdAt: -1 });
+        const query = req.query.q || '';
+        const page = parseInt(req.query.page) || 1;
+        const limit = 10;
+        const skip = (page - 1) * limit;
+
+        // Base criteria: user's own content
+        const searchCriteria = { author: req.user._id };
+
+        // Apply search if a query exists
+        if (query) {
+            const searchRegex = new RegExp(query, 'i');
+            searchCriteria.$or = [
+                { title: searchRegex },
+                { slug: searchRegex },
+                { category: searchRegex },
+                { subType: searchRegex },
+                // Limit bodyContent search to text blocks to optimize
+                { bodyContent: { $elemMatch: { type: { $in: ['paragraph', 'heading', 'list', 'quote'] }, content: searchRegex } } }
+            ];
+        }
+
+        // Get total count for pagination
+        const totalItems = await ArchiveItem.countDocuments(searchCriteria);
+        const totalPages = Math.ceil(totalItems / limit);
+
+        // Fetch paginated items submitted by the current user
+        const items = await ArchiveItem.find(searchCriteria)
+            .sort({ createdAt: -1 })
+            .skip(skip)
+            .limit(limit)
+            .lean(); // Faster processing
 
         res.render('admin/content-management', {
             user: req.user,
             items: items,
+            searchQuery: query,
+            currentPage: page,
+            totalPages: totalPages,
+            totalItems: totalItems,
             pageTitle: 'Content Management'
         });
     } catch (err) {

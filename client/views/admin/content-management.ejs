@@ -22,6 +22,16 @@
             <header class="admin-header">
                 <h1><i class="fas fa-file-alt"></i> Content Management</h1>
                 <p>Manage the entries you have contributed to the archive.</p>
+                <div style="margin-top: 1.5rem; max-width: 500px;">
+                    <form action="/admin/content-management" method="GET" style="display: flex; gap: 0.5rem;">
+                        <input type="text" name="q" placeholder="Search your entries by title, category, etc..."
+                            value="<%= searchQuery || '' %>"
+                            style="flex: 1; padding: 0.8rem 1rem; border-radius: 8px; border: none; font-size: 0.95rem; outline: none; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+                        <button type="submit"
+                            style="padding: 0 1.5rem; border-radius: 8px; background: #fff; color: #2a5298; border: none; font-weight: 600; cursor: pointer; transition: all 0.2s;"><i
+                                class="fas fa-search"></i> Search</button>
+                    </form>
+                </div>
             </header>
 
             <% if (locals.success_msg && success_msg.length> 0) { %>
@@ -36,55 +46,113 @@
                         <% } %>
 
                             <div class="management-list">
-                                <% if (items && items.length> 0) { %>
-                                    <% items.forEach(item=> { %>
-                                        <div class="management-item" id="item-<%= item._id %>">
-                                            <div class="item-info">
-                                                <h3>
-                                                    <%= item.title %>
-                                                </h3>
-                                                <div class="item-meta">
-                                                    <span class="item-category">
-                                                        <%= item.category %>
-                                                    </span>
-                                                    <% if(item.subType) { %>
-                                                        <span><i class="fas fa-tag"></i>
-                                                            <%= item.subType %>
-                                                        </span>
-                                                        <% } %>
-                                                            <span><i class="far fa-calendar-alt"></i>
-                                                                <%= new Date(item.createdAt).toLocaleDateString() %>
+                                <% if (searchQuery) { %>
+                                    <div
+                                        style="margin-bottom: 1rem; padding: 0.8rem 1.2rem; background: rgba(74, 144, 226, 0.1); color: var(--text-color, inherit); border-radius: 8px; display: flex; justify-content: space-between; align-items: center; border: 1px solid rgba(74, 144, 226, 0.2);">
+                                        <span><i class="fas fa-info-circle"
+                                                style="color: #4a90e2; margin-right: 5px;"></i> Showing results for:
+                                            <strong style="color: #000000;">"<%= searchQuery %>"</strong> (<%=
+                                                totalItems %> found)</span>
+                                        <a href="/admin/content-management"
+                                            style="color: #0c0c0c; text-decoration: none; font-size: 0.9rem;"><i
+                                                class="fas fa-times-circle"></i> Clear Search</a>
+                                    </div>
+                                    <% } %>
+                                        <% if (items && items.length> 0) { %>
+                                            <% items.forEach(item=> { %>
+                                                <div class="management-item" id="item-<%= item._id %>">
+                                                    <div class="item-info">
+                                                        <h3>
+                                                            <%= item.title %>
+                                                        </h3>
+                                                        <div class="item-meta">
+                                                            <span class="item-category">
+                                                                <%= item.category %>
                                                             </span>
+                                                            <% if(item.subType) { %>
+                                                                <span><i class="fas fa-tag"></i>
+                                                                    <%= item.subType %>
+                                                                </span>
+                                                                <% } %>
+                                                                    <span><i class="far fa-calendar-alt"></i>
+                                                                        <%= new
+                                                                            Date(item.createdAt).toLocaleDateString() %>
+                                                                    </span>
+                                                        </div>
+                                                    </div>
+                                                    <div class="item-actions">
+                                                        <a href="/entry/<%= item.slug %>" target="_blank"
+                                                            class="action-btn btn-view" title="View Entry">
+                                                            <i class="fas fa-eye"></i> View
+                                                        </a>
+                                                        <a href="/admin/edit/<%= item._id %>"
+                                                            class="action-btn btn-edit" title="Edit Entry">
+                                                            <i class="fas fa-edit"></i> Edit
+                                                        </a>
+                                                        <button onclick="deleteItem('<%= item._id %>')"
+                                                            class="action-btn btn-delete" title="Delete Entry">
+                                                            <i class="fas fa-trash-alt"></i> Delete
+                                                        </button>
+                                                    </div>
                                                 </div>
-                                            </div>
-                                            <div class="item-actions">
-                                                <a href="/entry/<%= item.slug %>" target="_blank"
-                                                    class="action-btn btn-view" title="View Entry">
-                                                    <i class="fas fa-eye"></i> View
-                                                </a>
-                                                <a href="/admin/edit/<%= item._id %>" class="action-btn btn-edit"
-                                                    title="Edit Entry">
-                                                    <i class="fas fa-edit"></i> Edit
-                                                </a>
-                                                <button onclick="deleteItem('<%= item._id %>')"
-                                                    class="action-btn btn-delete" title="Delete Entry">
-                                                    <i class="fas fa-trash-alt"></i> Delete
-                                                </button>
-                                            </div>
-                                        </div>
-                                        <% }) %>
-                                            <% } else { %>
-                                                <div class="empty-state">
-                                                    <i class="far fa-folder-open"></i>
-                                                    <h2>No contents found</h2>
-                                                    <p>You haven't added any entries to the archive yet.</p>
-                                                    <a href="/admin/add" class="action-btn btn-edit"
-                                                        style="margin-top: 1rem;">
-                                                        <i class="fas fa-plus"></i> Add New Entry
-                                                    </a>
-                                                </div>
-                                                <% } %>
+                                                <% }) %>
+                                                    <% } else { %>
+                                                        <div class="empty-state">
+                                                            <i
+                                                                class="<%= searchQuery ? 'fas fa-search-minus' : 'far fa-folder-open' %>"></i>
+                                                            <h2>
+                                                                <%= searchQuery ? 'No matches found'
+                                                                    : 'No contents found' %>
+                                                            </h2>
+                                                            <p>
+                                                                <%= searchQuery ? `We couldn't find any entries
+                                                                    matching "${searchQuery}" .`
+                                                                    : "You haven't added any entries to the archive yet."
+                                                                    %>
+                                                            </p>
+                                                            <% if (searchQuery) { %>
+                                                                <a href="/admin/content-management"
+                                                                    class="action-btn btn-view"
+                                                                    style="margin-top: 1rem;">
+                                                                    <i class="fas fa-sync-alt"></i> View All Content
+                                                                </a>
+                                                                <% } else { %>
+                                                                    <a href="/admin/add" class="action-btn btn-edit"
+                                                                        style="margin-top: 1rem;">
+                                                                        <i class="fas fa-plus"></i> Add New Entry
+                                                                    </a>
+                                                                    <% } %>
+                                                        </div>
+                                                        <% } %>
                             </div>
+
+                            <!-- PAGINATION CONTROLS -->
+                            <% if (typeof totalPages !=='undefined' && totalPages> 1) { %>
+                                <div class="pagination"
+                                    style="display: flex; justify-content: center; gap: 0.5rem; margin-top: 2rem;">
+                                    <% let pageQuery=searchQuery ? `&q=${encodeURIComponent(searchQuery)}` : '' ; %>
+
+                                        <% if (currentPage> 1) { %>
+                                            <a href="/admin/content-management?page=<%= currentPage - 1 %><%= pageQuery %>"
+                                                class="action-btn btn-view">&laquo; Prev</a>
+                                            <% } %>
+
+                                                <% let startPage=Math.max(1, currentPage - 2); let
+                                                    endPage=Math.min(totalPages, currentPage + 2); for(let i=startPage;
+                                                    i <=endPage; i++) { %>
+                                                    <a href="/admin/content-management?page=<%= i %><%= pageQuery %>"
+                                                        class="action-btn <%= i === currentPage ? 'btn-edit' : 'btn-view' %>"
+                                                        style="min-width: 40px; justify-content: center;">
+                                                        <%= i %>
+                                                    </a>
+                                                    <% } %>
+
+                                                        <% if (currentPage < totalPages) { %>
+                                                            <a href="/admin/content-management?page=<%= currentPage + 1 %><%= pageQuery %>"
+                                                                class="action-btn btn-view">Next &raquo;</a>
+                                                            <% } %>
+                                </div>
+                                <% } %>
         </div>
 
         <!-- Delete Functionality -->
