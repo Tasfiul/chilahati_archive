@@ -1,7 +1,8 @@
 const express = require('express');
 const router = express.Router();
-const { ensureStaff } = require('../middleware/checkRole');
+const { ensureStaff, ensureAdmin } = require('../middleware/checkRole');
 // Import all updated models
+const User = require('../models/User');
 const {
     ArchiveItem, History, Culture, NotablePerson, FreedomFighter,
     MeritoriousStudent, HiddenTalent, Occupation, HeartbreakingStory,
@@ -34,6 +35,93 @@ const MODEL_MAP = {
     'emergency-services': Emergency,
     'social-works': SocialWork
 };
+
+// --- NEW ADMIN DASHBOARD (ADMIN ONLY) ---
+
+router.get('/panel', ensureAdmin, async (req, res) => {
+    try {
+        // 1. OVERVIEW DATA
+        const totalUsers = await User.countDocuments();
+        const totalEntries = await ArchiveItem.countDocuments();
+
+        // Category Breakdown
+        const categoryCounts = await ArchiveItem.aggregate([
+            { $group: { _id: "$category", count: { $sum: 1 } } }
+        ]);
+
+        // Recent Entries
+        const recentEntries = await ArchiveItem.find()
+            .sort({ createdAt: -1 })
+            .limit(5)
+            .select('title category createdAt');
+
+        // 2. USER MANAGEMENT DATA
+        // Fetched directly here to keep it in one page as requested
+        const users = await User.find().sort({ createdAt: -1 });
+
+        res.render('admin/dashboard/index', {
+            user: req.user,
+            stats: {
+                totalUsers,
+                totalEntries,
+                categories: categoryCounts,
+                recentEntries
+            },
+            users,
+            pageTitle: 'Admin Dashboard'
+        });
+    } catch (err) {
+        console.error("Dashboard Error:", err);
+        res.status(500).send("Error loading admin dashboard");
+    }
+});
+
+// User Management Actions
+router.post('/users/update-role', ensureAdmin, async (req, res) => {
+    try {
+        const { userId, newRole } = req.body;
+        const targetUser = await User.findById(userId);
+        if (!targetUser) return res.status(404).json({ success: false, message: "User not found." });
+
+        // 1. Protection Logic
+        const isSelf = userId === req.user._id.toString();
+
+        // If it's NOT yourself, you cannot modify another admin
+        if (!isSelf && targetUser.role === 'admin') {
+            return res.status(403).json({ success: false, message: "You cannot modify another administrator's role." });
+        }
+
+        targetUser.role = newRole;
+        await targetUser.save();
+        res.json({ success: true });
+    } catch (err) {
+        res.status(500).json({ success: false, message: err.message });
+    }
+});
+
+router.delete('/users/:id', ensureAdmin, async (req, res) => {
+    try {
+        // 1. Prevent admin from deleting themselves
+        if (req.params.id === req.user._id.toString()) {
+            return res.status(400).json({ success: false, message: "You cannot delete yourself." });
+        }
+
+        // 2. Prevent admin from deleting another admin
+        const targetUser = await User.findById(req.params.id);
+        if (!targetUser) return res.status(404).json({ success: false, message: "User not found." });
+
+        if (targetUser.role === 'admin') {
+            return res.status(403).json({ success: false, message: "You cannot delete another administrator." });
+        }
+
+        await User.findByIdAndDelete(req.params.id);
+        res.json({ success: true });
+    } catch (err) {
+        res.status(500).json({ success: false, message: err.message });
+    }
+});
+
+// --- END ADMIN DASHBOARD ---
 
 // GET: Show the "Add Content" Page
 router.get('/add', ensureStaff, (req, res) => {

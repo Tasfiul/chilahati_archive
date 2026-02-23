@@ -14,12 +14,20 @@ module.exports = {
             if (req.user.role === 'admin' || req.user.role === 'supervisor') {
                 return next();
             } else {
-                // User is logged in but is just Level 3
                 req.flash('error_msg', 'You are not authorized to access this page.');
                 res.redirect('/');
             }
         } else {
             res.redirect('/login');
         }
+    },
+
+    // Strictly Level 1 (Admin Only)
+    ensureAdmin: function (req, res, next) {
+        if (req.isAuthenticated() && req.user.role === 'admin') {
+            return next();
+        }
+        req.flash('error_msg', 'Access denied. Administrator privileges required.');
+        res.redirect('/');
     }
 };
