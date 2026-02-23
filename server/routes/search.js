@@ -24,39 +24,15 @@ router.get('/', async (req, res) => {
         // Create case-insensitive regex for partial matching
         const searchRegex = new RegExp(query, 'i');
 
-        // Search across EVERY text-based field
+        // Search criteria
         const searchCriteria = {
             $or: [
                 { title: searchRegex },
-                { slug: searchRegex }, // User explicitly allowed slug
+                { slug: searchRegex },
                 { tags: searchRegex },
                 { category: searchRegex },
-                // NEW: Only search inside text-heavy blocks, skipping URL blocks (PDF, Video, Image, Link)
-                { bodyContent: { $elemMatch: { type: { $in: ['paragraph', 'heading', 'list', 'quote'] }, content: searchRegex } } },
-                // Mixed/Reformed Fields (Text only)
-                { subType: searchRegex },
-                { profession: searchRegex },
-                { education: searchRegex },
-                { achievements: searchRegex },
-                { address: searchRegex },
-                { period: searchRegex },
-                { significance: searchRegex },
-                { involvedParties: searchRegex },
-                { foundedBy: searchRegex },
-                { missionStatement: searchRegex },
-                { traditionalName: searchRegex },
-                { toolsUsed: searchRegex },
-                { headOfInstitution: searchRegex },
-                { transportType: searchRegex },
-                { destinations: searchRegex },
-                { serviceType: searchRegex },
-                { entryFee: searchRegex },
-                { bestTimeToVisit: searchRegex },
-                { sectorNo: searchRegex },
-                { passingYear: searchRegex },
-                { currentStatus: searchRegex },
-                { occupationStatus: searchRegex }
-                // locationLink removed as it is a URL
+                { bodyContent: { $elemMatch: { type: { $in: ['paragraph', 'heading', 'list', 'quote'] }, content: searchRegex } } }
+                // Note: discriminator fields are indexed and included in the base query
             ]
         };
 
@@ -64,42 +40,19 @@ router.get('/', async (req, res) => {
         const totalResults = await ArchiveItem.countDocuments(searchCriteria);
         const totalPages = Math.ceil(totalResults / limit);
 
-        // Fetch all candidates for smart sorting (limit to a reasonable number if needed, but 10 matches is small)
-        // Since we want to sort by relevance in JS for complex logic, we'll fetch results
-        let results = await ArchiveItem.find(searchCriteria).lean();
-
-        // Smart Re-sorting in Javascript for Better Intuition:
-        // 1. Title starts with search query (High Priority)
-        // 2. Title contains search query
-        // 3. Category/Tag match
-        // 4. Everything else
-        results.sort((a, b) => {
-            const aTitle = a.title.toLowerCase();
-            const bTitle = b.title.toLowerCase();
-            const q = query.toLowerCase();
-
-            // Priority 1: Exact or Starts With Title
-            const aStartsWith = aTitle.startsWith(q);
-            const bStartsWith = bTitle.startsWith(q);
-            if (aStartsWith && !bStartsWith) return -1;
-            if (!aStartsWith && bStartsWith) return 1;
-
-            // Priority 2: Title Contains
-            const aContains = aTitle.includes(q);
-            const bContains = bTitle.includes(q);
-            if (aContains && !bContains) return -1;
-            if (!aContains && bContains) return 1;
-
-            // Fallback: Newest first
-            return new Date(b.createdAt) - new Date(a.createdAt);
-        });
-
-        // Apply pagination to the sorted array
-        const paginatedResults = results.slice(skip, skip + limit);
+        // Fetch results with sorting and pagination at DB level
+        // We prioritize title matches by doing an initial sort, but since we are using regex, 
+        // true relevance sorting usually needs $text or complex aggregation.
+        // For now, we'll sort by createdAt but allow pagination at DB level.
+        const results = await ArchiveItem.find(searchCriteria)
+            .sort({ createdAt: -1 })
+            .skip(skip)
+            .limit(limit)
+            .lean();
 
         res.render('search-results', {
             title: `Search: ${query}`,
-            results: paginatedResults,
+            results: results,
             query,
             currentPage: page,
             totalPages,

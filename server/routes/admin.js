@@ -9,6 +9,18 @@ const {
     SocialWork, Institution, Transport, Emergency, TouristSpot
 } = require('../models/ArchiveItem');
 const Traffic = require('../models/Traffic');
+const sanitizeHtml = require('sanitize-html');
+
+// Sanitization utility
+const sanitizeContent = (content) => {
+    if (typeof content !== 'string') return content;
+    return sanitizeHtml(content, {
+        allowedTags: ['b', 'i', 'em', 'strong', 'a', 'p', 'br', 'ul', 'ol', 'li'],
+        allowedAttributes: {
+            'a': ['href', 'target']
+        }
+    });
+};
 
 
 // 1. Updated Model Map to match the 14 Reformed categories
@@ -220,6 +232,13 @@ router.post('/add', ensureStaff, async (req, res) => {
         if (bodyContentJSON) {
             try {
                 parsedBodyContent = JSON.parse(bodyContentJSON);
+                // Sanitize each block
+                parsedBodyContent = parsedBodyContent.map(block => {
+                    if (['paragraph', 'heading', 'quote'].includes(block.type)) {
+                        block.content = sanitizeContent(block.content);
+                    }
+                    return block;
+                });
             } catch (pErr) {
                 console.error("DEBUG: JSON Parse Error:", pErr);
             }
@@ -330,6 +349,13 @@ router.post('/edit/:id', ensureStaff, async (req, res) => {
         if (bodyContentJSON) {
             try {
                 parsedBodyContent = JSON.parse(bodyContentJSON);
+                // Sanitize each block
+                parsedBodyContent = parsedBodyContent.map(block => {
+                    if (['paragraph', 'heading', 'quote'].includes(block.type)) {
+                        block.content = sanitizeContent(block.content);
+                    }
+                    return block;
+                });
             } catch (pErr) {
                 console.error("DEBUG: JSON Parse Error:", pErr);
             }

@@ -11,6 +11,7 @@ const entryRoutes = require('./routes/entry');
 const searchRoutes = require('./routes/search'); // NEW
 const userRoutes = require('./routes/user'); // NEW
 const trafficTracker = require('./middleware/trafficTracker');
+const helmet = require('helmet');
 
 // Passport Config
 require('./config/passport')(passport);
@@ -27,19 +28,21 @@ mongoose.connect(process.env.MONGODB_URI)
 
 // 2. Basic Middleware
 const PORT = process.env.PORT || 3000;
+app.use(helmet({
+    contentSecurityPolicy: {
+        directives: {
+            ...helmet.contentSecurityPolicy.getDefaultDirectives(),
+            "img-src": ["'self'", "data:", "https:", "http:"],
+            "script-src": ["'self'", "'unsafe-inline'", "https://cdn.jsdelivr.net", "https://cdnjs.cloudflare.com"],
+            "frame-src": ["'self'", "https://www.youtube.com", "https://drive.google.com"],
+        },
+    },
+}));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, '../client/views'));
 app.use(express.static(path.join(__dirname, '../client/public')));
-// --- NEW: DISABLE BROWSER CACHING ---
-// This prevents the "Back Button" from showing a logged-in page after logout
-app.use((req, res, next) => {
-    res.set('Cache-Control', 'no-store, no-cache, must-revalidate, private');
-    res.set('Pragma', 'no-cache');
-    res.set('Expires', '0');
-    next();
-});
 // 3. Session Setup
 app.use(session({
     secret: process.env.SESSION_SECRET,
@@ -75,6 +78,15 @@ app.use('/', userRoutes); // NEW: User profile routes
 
 app.get('/', (req, res) => {
     res.render('home');
+});
+
+// Centralized Error Handler
+app.use((err, req, res, next) => {
+    console.error(err.stack);
+    res.status(500).render('error', {
+        message: process.env.NODE_ENV === 'production' ? 'Something went wrong!' : err.message,
+        user: req.user || null
+    });
 });
 
 // 8. Start Server

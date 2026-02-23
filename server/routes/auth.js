@@ -5,6 +5,7 @@ const crypto = require('crypto');
 const nodemailer = require('nodemailer');
 const User = require('../models/User');
 const passport = require('passport');
+const { authLimiter } = require('../middleware/rateLimiter');
 
 // --- EMAIL CONFIGURATION ---
 const transporter = nodemailer.createTransport({
@@ -23,7 +24,7 @@ router.get('/login', (req, res) => {
 });
 
 // POST: Handle Login
-router.post('/login', (req, res, next) => {
+router.post('/login', authLimiter, (req, res, next) => {
     passport.authenticate('local', async (err, user, info) => {
         if (err) return next(err);
 
@@ -76,7 +77,7 @@ router.get('/register', (req, res) => {
 });
 
 // POST: Handle Registration
-router.post('/register', async (req, res) => {
+router.post('/register', authLimiter, async (req, res) => {
     try {
         const { username, email, password } = req.body;
 
@@ -178,7 +179,7 @@ router.post('/register', async (req, res) => {
 });
 
 // GET: Verify Account
-router.get('/verify/:token', async (req, res) => {
+router.get('/verify/:token', authLimiter, async (req, res) => {
     try {
         const token = req.params.token;
         console.log(`DEBUG: Verification attempt with token: ${token}`);

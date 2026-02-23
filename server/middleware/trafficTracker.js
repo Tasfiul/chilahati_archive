@@ -10,27 +10,29 @@ const trafficTracker = async (req, res, next) => {
     const userIP = req.ip || req.connection.remoteAddress;
 
     try {
-        // 3. Update or Create traffic record for today
-        let dayTraffic = await Traffic.findOne({ date: today });
+        // Atomic update: increment views and add IP to set
+        const update = { $inc: { views: 1 } };
 
-        if (!dayTraffic) {
-            dayTraffic = new Traffic({
-                date: today,
-                views: 1,
-                uniqueVisits: 1,
-                ips: [userIP]
-            });
-        } else {
-            dayTraffic.views += 1;
-
-            // Check if IP is unique for today
-            if (!dayTraffic.ips.includes(userIP)) {
-                dayTraffic.uniqueVisits += 1;
-                dayTraffic.ips.push(userIP);
-            }
+        // Safety limit: Don't let the IP array grow indefinitely (max 5000 IPs per day)
+        // This prevents the 16MB document limit issue in production.
+        const currentRecord = await Traffic.findOne({ date: today });
+        if (!currentRecord || (currentRecord.ips && currentRecord.ips.length < 5000)) {
+            update.$addToSet = { ips: userIP };
         }
 
-        await dayTraffic.save();
+        const result = await Traffic.findOneAndUpdate(
+            { date: today },
+            update,
+            { upsert: true, new: true }
+        );
+
+        // Update uniqueVisits based on the actual count of IPs stored
+        if (result && result.ips) {
+            await Traffic.updateOne(
+                { date: today },
+                { $set: { uniqueVisits: result.ips.length } }
+            );
+        }
     } catch (err) {
         console.error("Traffic Tracker Error:", err);
     }
