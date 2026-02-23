@@ -82,6 +82,26 @@
                                 </div>
                                 <% } %>
             </div>
+
+            <!-- PAGINATION -->
+            <% if (typeof totalPages !=='undefined' && totalPages> 1) { %>
+                <div class="pagination">
+                    <% if (currentPage> 1) { %>
+                        <a href="?page=<%= currentPage - 1 %>" class="page-link">&laquo; Prev</a>
+                        <% } %>
+
+                            <% for(let i=1; i <=totalPages; i++) { %>
+                                <a href="?page=<%= i %>" class="page-link <%= currentPage === i ? 'active' : '' %>">
+                                    <%= i %>
+                                </a>
+                                <% } %>
+
+                                    <% if (currentPage < totalPages) { %>
+                                        <a href="?page=<%= currentPage + 1 %>" class="page-link">Next &raquo;</a>
+                                        <% } %>
+                </div>
+                <% } %>
+
         </div>
 
         <%- include('../partials/footer') %>

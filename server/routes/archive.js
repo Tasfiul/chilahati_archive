@@ -57,8 +57,23 @@ router.get('/:category', async (req, res) => {
         // 4. DECISION: LIST OR SUB-MENU?
         if (!foundField || subTypes.length === 0) {
             const queryCategory = category.replace(/-/g, ' ');
-            const items = await ArchiveItem.find({ category: new RegExp('^' + queryCategory + '$', 'i') });
-            return res.render('archive/list', { items, title: queryCategory, category: queryCategory });
+            const queryObj = { category: new RegExp('^' + queryCategory + '$', 'i') };
+
+            const page = parseInt(req.query.page) || 1;
+            const limit = 10;
+            const skip = (page - 1) * limit;
+
+            const totalItems = await ArchiveItem.countDocuments(queryObj);
+            const totalPages = Math.ceil(totalItems / limit);
+
+            const items = await ArchiveItem.find(queryObj).skip(skip).limit(limit);
+            return res.render('archive/list', {
+                items,
+                title: queryCategory,
+                category: queryCategory,
+                currentPage: page,
+                totalPages: totalPages
+            });
         }
 
         // Render the sub-categories page
@@ -88,13 +103,25 @@ router.get('/:category/:subType', async (req, res) => {
             $or: orClauses
         };
 
-        const items = await ArchiveItem.find(query).select('title slug thumbnail category subType');
+        const page = parseInt(req.query.page) || 1;
+        const limit = 10;
+        const skip = (page - 1) * limit;
+
+        const totalItems = await ArchiveItem.countDocuments(query);
+        const totalPages = Math.ceil(totalItems / limit);
+
+        const items = await ArchiveItem.find(query)
+            .select('title slug thumbnail category subType')
+            .skip(skip)
+            .limit(limit);
 
         res.render('archive/list', {
             items,
             title: `${subType} ${queryCategory}`,
             category: queryCategory,
-            subType
+            subType,
+            currentPage: page,
+            totalPages: totalPages
         });
     } catch (err) {
         console.error(err);
