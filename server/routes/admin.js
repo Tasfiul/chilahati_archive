@@ -148,6 +148,22 @@ router.post('/add', ensureStaff, async (req, res) => {
         if (otherFields.eventDate) itemData.dateOfIncident = otherFields.eventDate;
         if (otherFields.establishedDate) itemData.establishedDate = otherFields.establishedDate;
 
+        // 7. Format Array Fields (Comma-separated from frontend)
+        const arrayFields = ['achievements', 'involvedParties', 'toolsUsed', 'destinations'];
+        arrayFields.forEach(field => {
+            if (otherFields[field] !== undefined) {
+                itemData[field] = otherFields[field].split(',').map(s => s.trim()).filter(Boolean);
+            }
+        });
+
+        // 8. Handle empty dates (Convert empty strings to undefined to prevent CastErrors)
+        const dateFields = ['dateOfBirth', 'dateOfDeath', 'eventDate', 'establishedDate', 'dateOfIncident'];
+        dateFields.forEach(field => {
+            if (itemData[field] === '') {
+                delete itemData[field]; // Mongoose will ignore undefined fields
+            }
+        });
+
         console.log("DEBUG: Final itemData to Save:", JSON.stringify(itemData, null, 2));
 
         // 7. Create and Save
@@ -240,6 +256,22 @@ router.post('/edit/:id', ensureStaff, async (req, res) => {
         // 6. Normalizing dates
         if (otherFields.eventDate) updateData.dateOfIncident = otherFields.eventDate;
         if (otherFields.establishedDate) updateData.establishedDate = otherFields.establishedDate;
+
+        // 7. Format Array Fields (Comma-separated from frontend)
+        const arrayFields = ['achievements', 'involvedParties', 'toolsUsed', 'destinations'];
+        arrayFields.forEach(field => {
+            if (otherFields[field] !== undefined) {
+                updateData[field] = otherFields[field].split(',').map(s => s.trim()).filter(Boolean);
+            }
+        });
+
+        // 8. Handle empty dates (Convert empty strings to undefined to prevent CastErrors)
+        const dateFields = ['dateOfBirth', 'dateOfDeath', 'eventDate', 'establishedDate', 'dateOfIncident'];
+        dateFields.forEach(field => {
+            if (updateData[field] === '') {
+                delete updateData[field]; // Mongoose will ignore undefined, removing the field from the update
+            }
+        });
 
         console.log("DEBUG: Final updateData:", JSON.stringify(updateData, null, 2));
 

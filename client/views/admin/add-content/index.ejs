@@ -116,19 +116,107 @@
 
                                     <!-- C. PERSON SPECIFIC -->
                                     <div id="PersonExtra" class="specific-group hidden">
-                                        <label>Education/Profession</label>
-                                        <input type="text" name="profession" placeholder="e.g. PhD, Artist, etc.">
-                                        <label>Date of Birth</label>
-                                        <input type="date" name="dateOfBirth">
+                                        <label>Education</label>
+                                        <input type="text" name="education"
+                                            placeholder="e.g. B.A. from Dhaka University">
+                                        <label>Profession</label>
+                                        <input type="text" name="profession"
+                                            placeholder="e.g. PhD, Artist, Doctor, etc.">
+
+                                        <!-- Dates -->
+                                        <div style="display: flex; gap: 1rem;">
+                                            <div style="flex: 1;">
+                                                <label>Date of Birth</label>
+                                                <input type="date" name="dateOfBirth">
+                                            </div>
+                                            <div style="flex: 1;">
+                                                <label>Date of Death (If applicable)</label>
+                                                <input type="date" name="dateOfDeath">
+                                            </div>
+                                        </div>
+
+                                        <label>Current Status (e.g. for Students or Living Persons)</label>
+                                        <input type="text" name="currentStatus"
+                                            placeholder="e.g. Studying at RUET, Living in Dhaka">
+                                        <label>Passing Year (Primarily for Students)</label>
+                                        <input type="number" name="passingYear" placeholder="e.g. 2023">
+
+                                        <label>Achievements (Comma separated)</label>
+                                        <input type="text" name="achievements"
+                                            placeholder="e.g. Gold Medalist, Published Author">
+
                                         <label>Sector No (Only if Freedom Fighter)</label>
                                         <input type="text" name="sectorNo"
                                             placeholder="Which sector did they fight in?">
                                     </div>
 
-                                    <!-- D. STORY/HERITAGE SPECIFIC -->
+                                    <!-- D. STORY / NARRATIVE SPECIFIC (History, Culture, Heartbreaking) -->
                                     <div id="NarrativeExtra" class="specific-group hidden">
                                         <label>Date of Event/Incident</label>
                                         <input type="date" name="eventDate">
+                                        <label>Involved Parties (Comma separated)</label>
+                                        <input type="text" name="involvedParties"
+                                            placeholder="e.g. local villagers, British Army">
+                                    </div>
+
+                                    <!-- E. HERITAGE / CULTURE SPECIFIC (History, Culture, Occupation) -->
+                                    <div id="HeritageExtra" class="specific-group hidden">
+                                        <label>Historical Period</label>
+                                        <input type="text" name="period"
+                                            placeholder="e.g. British Era, 1971 Liberation War">
+                                        <label>Historical Significance</label>
+                                        <textarea name="significance"
+                                            placeholder="Briefly describe why this is historically significant"
+                                            rows="2"></textarea>
+                                    </div>
+
+                                    <!-- F. OCCUPATION SPECIFIC -->
+                                    <div id="OccupationExtra" class="specific-group hidden">
+                                        <label>Traditional Name (Local term)</label>
+                                        <input type="text" name="traditionalName" placeholder="e.g. Kumar, Kamar, Jele">
+                                        <label>Tools Used (Comma separated)</label>
+                                        <input type="text" name="toolsUsed" placeholder="e.g. Charka, Clay wheel, Net">
+                                        <label>Current Status of Occupation</label>
+                                        <select name="occupationStatus">
+                                            <option value="">-- Select Status --</option>
+                                            <option value="Thriving">Thriving</option>
+                                            <option value="Declining">Declining</option>
+                                            <option value="Extinct">Extinct</option>
+                                        </select>
+                                    </div>
+
+                                    <!-- G. TRANSPORT SPECIFIC -->
+                                    <div id="TransportExtra" class="specific-group hidden">
+                                        <label>Destinations (Comma separated)</label>
+                                        <input type="text" name="destinations"
+                                            placeholder="e.g. Dhaka, Rangpur, Syedpur">
+                                    </div>
+
+                                    <!-- H. EMERGENCY SERVICES SPECIFIC -->
+                                    <div id="EmergencyExtra" class="specific-group hidden">
+                                        <label>Is this a 24/7 Service?</label>
+                                        <select name="is24Hours">
+                                            <option value="true">Yes, 24/7</option>
+                                            <option value="false">No, limited hours</option>
+                                        </select>
+                                    </div>
+
+                                    <!-- I. SOCIAL WORKS SPECIFIC -->
+                                    <div id="SocialWorksExtra" class="specific-group hidden">
+                                        <label>Founded By</label>
+                                        <input type="text" name="foundedBy"
+                                            placeholder="Name of founder(s) or organization">
+                                        <label>Mission Statement</label>
+                                        <textarea name="missionStatement" placeholder="Core goal of the social work"
+                                            rows="2"></textarea>
+                                    </div>
+
+                                    <!-- J. TOURIST SPOTS SPECIFIC -->
+                                    <div id="TouristExtra" class="specific-group hidden">
+                                        <label>Entry Fee</label>
+                                        <input type="text" name="entryFee" placeholder="e.g. 50 BDT, Free">
+                                        <label>Best Time to Visit</label>
+                                        <input type="text" name="bestTimeToVisit" placeholder="e.g. Winter, Afternoon">
                                     </div>
                                 </div>
 
@@ -225,6 +313,14 @@
                 if (['history', 'culture', 'Heartbreaking stories'].includes(cat)) {
                     document.getElementById('NarrativeExtra').classList.remove('hidden');
                 }
+                if (['history', 'culture', 'occupation'].includes(cat)) {
+                    document.getElementById('HeritageExtra').classList.remove('hidden');
+                }
+                if (cat === 'occupation') document.getElementById('OccupationExtra').classList.remove('hidden');
+                if (cat === 'transport') document.getElementById('TransportExtra').classList.remove('hidden');
+                if (cat === 'Emergency services') document.getElementById('EmergencyExtra').classList.remove('hidden');
+                if (cat === 'social works') document.getElementById('SocialWorksExtra').classList.remove('hidden');
+                if (cat === 'tourist spots') document.getElementById('TouristExtra').classList.remove('hidden');
             });
 
             // 3. BLOCK EDITOR LOGIC
