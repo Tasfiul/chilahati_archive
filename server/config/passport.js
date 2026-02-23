@@ -16,7 +16,7 @@ module.exports = function (passport) {
 
                 // 2. Check if Email is Verified
                 if (!user.isVerified) {
-                    return done(null, false, { message: 'Please verify your email first. Check your inbox.' });
+                    return done(null, false, { message: 'NOT_VERIFIED' });
                 }
 
                 // 3. Match Password

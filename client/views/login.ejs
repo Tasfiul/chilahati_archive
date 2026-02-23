@@ -21,50 +21,59 @@
         <div class="auth-container">
             <div class="auth-card">
                 <h2>Welcome Back</h2>
-                <!-- ERROR MESSAGES (From Passport) -->
-                <% if (error && error.length> 0) { %>
+                <!-- ERROR MESSAGES (Custom) -->
+                <% if (error_msg && error_msg.length> 0) { %>
                     <div
                         style="background: rgba(255, 107, 107, 0.2); border: 1px solid #ff6b6b; color: #ff6b6b; padding: 10px; border-radius: 8px; margin-bottom: 15px; text-align: center;">
                         <i class="fas fa-exclamation-circle"></i>
-                        <%= error %>
+                        <%= error_msg %>
                     </div>
                     <% } %>
 
-                        <!-- SUCCESS MESSAGES -->
-                        <% if (success_msg && success_msg.length> 0) { %>
+                        <!-- ERROR MESSAGES (From Passport) -->
+                        <% if (error && error.length> 0) { %>
                             <div
-                                style="background: rgba(46, 204, 113, 0.2); border: 1px solid #2ecc71; color: #2ecc71; padding: 10px; border-radius: 8px; margin-bottom: 15px; text-align: center;">
-                                <i class="fas fa-check-circle"></i>
-                                <%= success_msg %>
+                                style="background: rgba(255, 107, 107, 0.2); border: 1px solid #ff6b6b; color: #ff6b6b; padding: 10px; border-radius: 8px; margin-bottom: 15px; text-align: center;">
+                                <i class="fas fa-exclamation-circle"></i>
+                                <%= error %>
                             </div>
                             <% } %>
-                                <!-- The Form -->
-                                <form action="/login" method="POST">
 
-                                    <div class="form-group">
-                                        <label for="email">Email Address</label>
-                                        <input type="email" id="email" name="email" class="form-control"
-                                            placeholder="Enter your email" required>
+                                <!-- SUCCESS MESSAGES -->
+                                <% if (success_msg && success_msg.length> 0) { %>
+                                    <div
+                                        style="background: rgba(46, 204, 113, 0.2); border: 1px solid #2ecc71; color: #2ecc71; padding: 10px; border-radius: 8px; margin-bottom: 15px; text-align: center;">
+                                        <i class="fas fa-check-circle"></i>
+                                        <%= success_msg %>
                                     </div>
+                                    <% } %>
+                                        <!-- The Form -->
+                                        <form action="/login" method="POST">
 
-                                    <div class="form-group">
-                                        <label for="password">Password</label>
-                                        <input type="password" id="password" name="password" class="form-control"
-                                            placeholder="Enter your password" required>
-                                        <div style="text-align: right; margin-top: 5px;">
-                                            <a href="/forgot-password"
-                                                style="font-size: 0.85rem; color: #000000; text-decoration: none;">Forgot
-                                                Password?</a>
+                                            <div class="form-group">
+                                                <label for="email">Email Address</label>
+                                                <input type="email" id="email" name="email" class="form-control"
+                                                    placeholder="Enter your email" required>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label for="password">Password</label>
+                                                <input type="password" id="password" name="password"
+                                                    class="form-control" placeholder="Enter your password" required>
+                                                <div style="text-align: right; margin-top: 5px;">
+                                                    <a href="/forgot-password"
+                                                        style="font-size: 0.85rem; color: #000000; text-decoration: none;">Forgot
+                                                        Password?</a>
+                                                </div>
+                                            </div>
+
+                                            <button type="submit" class="btn-block">Login</button>
+                                        </form>
+
+                                        <div class="auth-footer">
+                                            Don't have an account?
+                                            <a href="/register" class="auth-link">Register here</a>
                                         </div>
-                                    </div>
-
-                                    <button type="submit" class="btn-block">Login</button>
-                                </form>
-
-                                <div class="auth-footer">
-                                    Don't have an account?
-                                    <a href="/register" class="auth-link">Register here</a>
-                                </div>
             </div>
         </div>
 

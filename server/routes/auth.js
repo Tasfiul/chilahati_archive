@@ -24,10 +24,49 @@ router.get('/login', (req, res) => {
 
 // POST: Handle Login
 router.post('/login', (req, res, next) => {
-    passport.authenticate('local', {
-        successRedirect: '/',       // Where to go if login works
-        failureRedirect: '/login',  // Where to go if login fails
-        failureFlash: true
+    passport.authenticate('local', async (err, user, info) => {
+        if (err) return next(err);
+
+        if (!user) {
+            if (info.message === 'NOT_VERIFIED') {
+                // Handle unverified user re-verification
+                try {
+                    const email = req.body.email;
+                    const foundUser = await User.findOne({ email });
+
+                    if (foundUser) {
+                        const token = crypto.randomBytes(32).toString('hex');
+                        foundUser.verificationToken = token;
+                        foundUser.createdAt = Date.now(); // Reset expiration
+                        await foundUser.save();
+
+                        const baseUrl = (process.env.BASE_URL || `http://localhost:${process.env.PORT || 3000}`).replace(/\/+$/, '');
+                        const verificationLink = `${baseUrl}/verify/${token}`;
+
+                        const mailOptions = {
+                            from: `"Chilahati Archive Admin" <${process.env.EMAIL_USER}>`,
+                            to: email,
+                            subject: 'Verify your Chilahati Archive account',
+                            html: `<p>Please verify your account by <strong><a href="${verificationLink}">clicking here</a></strong>. This link expires in 1 hour.</p>`
+                        };
+
+                        await transporter.sendMail(mailOptions);
+                        req.flash('error_msg', 'Your account is not verified. A new verification link has been sent to your email.');
+                    }
+                } catch (mailErr) {
+                    console.error('Re-verification email failed:', mailErr);
+                    req.flash('error_msg', 'Account not verified. Also failed to send a new link. Please contact support.');
+                }
+                return res.redirect('/login');
+            }
+            req.flash('error', info.message);
+            return res.redirect('/login');
+        }
+
+        req.logIn(user, (err) => {
+            if (err) return next(err);
+            return res.redirect('/');
+        });
     })(req, res, next);
 });
 
@@ -43,7 +82,32 @@ router.post('/register', async (req, res) => {
 
         // Check if user exists
         const existingUser = await User.findOne({ $or: [{ email }, { username }] });
+
         if (existingUser) {
+            if (!existingUser.isVerified) {
+                // If unverified, re-send verification email and notify
+                const token = crypto.randomBytes(32).toString('hex');
+                existingUser.verificationToken = token;
+                existingUser.createdAt = Date.now();
+                await existingUser.save();
+
+                const baseUrl = (process.env.BASE_URL || `http://localhost:${process.env.PORT || 3000}`).replace(/\/+$/, '');
+                const verificationLink = `${baseUrl}/verify/${token}`;
+
+                try {
+                    await transporter.sendMail({
+                        from: `"Chilahati Archive Admin" <${process.env.EMAIL_USER}>`,
+                        to: email,
+                        subject: 'Confirm your Chilahati Archive account',
+                        html: `<p>An unverified account already exists. Please <strong><a href="${verificationLink}">click here</a></strong> to verify. Expires in 1 hour.</p>`
+                    });
+                    req.flash('success_msg', 'An unverified account with this email/username already exists. A new verification link has been sent to your inbox.');
+                    return res.redirect('/register');
+                } catch (err) {
+                    req.flash('error_msg', 'Account exists but is unverified, and we failed to send a new link. Please try again later.');
+                    return res.redirect('/register');
+                }
+            }
             req.flash('error_msg', 'Email or Username is already registered. Please Login.');
             return res.redirect('/register');
         }
@@ -84,20 +148,28 @@ router.post('/register', async (req, res) => {
             html: `
                 <p>Hi,</p>
                 <p>Welcome to Chilahati Archive! Please verify your account by <strong><a href="${verificationLink}">clicking here</a></strong>.</p>
+                <p><strong>Note:</strong> This link will expire in 1 hour.</p>
                 <p>Best regards,<br>The Chilahati Archive Team</p>
             `
         };
 
-        await transporter.sendMail(mailOptions);
-
-        // Success Message
-        res.send(`
-            <center style="margin-top:100px; font-family:sans-serif;">
-                <h1>Registration Successful!</h1>
-                <p>We have sent a verification email to <strong>${email}</strong>.</p>
-                <p>Please check your inbox to activate your account.</p>
-            </center>
-        `);
+        try {
+            await transporter.sendMail(mailOptions);
+            // Success Message
+            res.send(`
+                <center style="margin-top:100px; font-family:sans-serif;">
+                    <h1>Registration Successful!</h1>
+                    <p>We have sent a verification email to <strong>${email}</strong>.</p>
+                    <p>Please check your inbox to activate your account. Link expires in 1 hour.</p>
+                </center>
+            `);
+        } catch (mailErr) {
+            console.error('Mail send error:', mailErr);
+            // Delete user if email fails
+            await User.findByIdAndDelete(newUser._id);
+            req.flash('error_msg', 'Failed to send verification email. Please check if your email address is correct and try again.');
+            res.redirect('/register');
+        }
 
     } catch (err) {
         console.error(err);
@@ -115,7 +187,13 @@ router.get('/verify/:token', async (req, res) => {
 
         if (!user) {
             console.log(`DEBUG: No user found for token: ${token}`);
-            return res.send('<h1>Invalid or Expired Token</h1><p>We could not find a user associated with this verification link. It may have expired or already been used.</p>');
+            return res.send('<h1>Invalid Link</h1><p>This verification link is invalid or has already been used.</p>');
+        }
+
+        // Check for 1-hour expiration
+        const oneHour = 60 * 60 * 1000;
+        if (Date.now() - user.createdAt > oneHour) {
+            return res.send('<h1>Link Expired</h1><p>Your verification link has expired (1 hour limit). Please try to login or register again to receive a new link.</p>');
         }
 
         console.log(`DEBUG: User found: ${user.email}. Mark as verified.`);
