@@ -1,0 +1,291 @@
+/* Content Management Page Styles */
+
+/* 1. Header enhancements */
+.admin-header {
+    background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+    color: white;
+    padding: 2rem 2.5rem;
+    border-radius: 12px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    margin-bottom: 2.5rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.admin-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 200px;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1));
+    transform: skewX(-20deg);
+}
+
+body.dark-mode .admin-header {
+    background: linear-gradient(135deg, #182848, #0f172a);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
+}
+
+.admin-header h1 {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+    color: white;
+}
+
+.admin-header p {
+    color: rgba(255, 255, 255, 0.85);
+    font-size: 1.05rem;
+    margin: 0;
+}
+
+.management-list {
+    margin-top: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+}
+
+/* 2. Management Cards with High Contrast */
+.management-item {
+    background: #ffffff;
+    border: 1px solid #eaeaea;
+    border-radius: 12px;
+    padding: 1.5rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.dark-mode .management-item {
+    background: #1e1e1e;
+    border: 1px solid #333333;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.management-item:hover {
+    transform: translateY(-4px);
+    border-color: #4a90e2;
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
+}
+
+.dark-mode .management-item:hover {
+    border-color: #4a90e2;
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.4);
+}
+
+/* 3. Typography & Meta Info inside cards */
+.item-info h3 {
+    margin: 0 0 0.8rem 0;
+    font-size: 1.35rem;
+    color: #2c3e50;
+    font-weight: 600;
+}
+
+.dark-mode .item-info h3 {
+    color: #e0e6ed;
+}
+
+.item-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.2rem;
+    font-size: 0.9rem;
+    color: #666;
+}
+
+.dark-mode .item-meta {
+    color: #aaa;
+}
+
+.item-meta span {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.item-category {
+    background: rgba(74, 144, 226, 0.15);
+    color: #2c6eb8;
+    padding: 0.35rem 0.8rrem;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding-left: 12px;
+    padding-right: 12px;
+}
+
+.dark-mode .item-category {
+    background: rgba(74, 144, 226, 0.2);
+    color: #7ab4f8;
+}
+
+/* 4. Action Buttons */
+.item-actions {
+    display: flex;
+    gap: 0.8rem;
+    flex-wrap: wrap;
+}
+
+.action-btn {
+    padding: 0.65rem 1.2rem;
+    border-radius: 8px;
+    font-weight: 500;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-size: 0.95rem;
+    cursor: pointer;
+    border: none;
+    transition: all 0.2s;
+    outline: none;
+}
+
+.action-btn i {
+    font-size: 1.1em;
+}
+
+.btn-view {
+    background: #eaf3fc;
+    color: #4a90e2;
+}
+
+.btn-view:hover {
+    background: #4a90e2;
+    color: white;
+}
+
+.dark-mode .btn-view {
+    background: rgba(74, 144, 226, 0.15);
+}
+
+.dark-mode .btn-view:hover {
+    background: #4a90e2;
+    color: white;
+}
+
+.btn-edit {
+    background: #eafaf1;
+    color: #2ecc71;
+}
+
+.btn-edit:hover {
+    background: #2ecc71;
+    color: white;
+}
+
+.dark-mode .btn-edit {
+    background: rgba(46, 204, 113, 0.15);
+}
+
+.dark-mode .btn-edit:hover {
+    background: #2ecc71;
+    color: white;
+}
+
+.btn-delete {
+    background: #fdf0ed;
+    color: #e74c3c;
+}
+
+.btn-delete:hover {
+    background: #e74c3c;
+    color: white;
+    box-shadow: 0 4px 10px rgba(231, 76, 60, 0.3);
+}
+
+.dark-mode .btn-delete {
+    background: rgba(231, 76, 60, 0.15);
+}
+
+.dark-mode .btn-delete:hover {
+    background: #e74c3c;
+    color: white;
+}
+
+/* 5. Empty State styling */
+.empty-state {
+    text-align: center;
+    padding: 6rem 2rem;
+    background: #ffffff;
+    border-radius: 12px;
+    border: 2px dashed #ddd;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
+    margin-top: 1rem;
+}
+
+.dark-mode .empty-state {
+    background: transparent;
+    border-color: #444;
+    box-shadow: none;
+}
+
+.empty-state i.fa-folder-open {
+    font-size: 5rem;
+    color: #d1dde8;
+    margin-bottom: 1.5rem;
+}
+
+.dark-mode .empty-state i.fa-folder-open {
+    color: #333;
+}
+
+.empty-state h2 {
+    color: #333;
+    margin-bottom: 0.8rem;
+    font-size: 1.8rem;
+}
+
+.dark-mode .empty-state h2 {
+    color: #ddd;
+}
+
+.empty-state p {
+    color: #666;
+    font-size: 1.1rem;
+    margin-bottom: 1.5rem;
+}
+
+.dark-mode .empty-state p {
+    color: #888;
+}
+
+.empty-state .btn-edit {
+    font-size: 1.1rem;
+    padding: 0.8rem 1.5rem;
+    box-shadow: 0 4px 12px rgba(46, 204, 113, 0.2);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .management-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1.5rem;
+        padding: 1.5rem;
+    }
+
+    .item-actions {
+        width: 100%;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+    }
+
+    .btn-delete {
+        grid-column: span 2;
+    }
+
+    .action-btn {
+        justify-content: center;
+    }
+}

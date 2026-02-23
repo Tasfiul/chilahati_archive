@@ -5,7 +5,7 @@ const { ensureStaff } = require('../middleware/checkRole');
 const {
     ArchiveItem, History, Culture, NotablePerson, FreedomFighter,
     MeritoriousStudent, HiddenTalent, Occupation, HeartbreakingStory,
-    SocialWork, InteractiveMap, Institution, Transport, Emergency, TouristSpot
+    SocialWork, Institution, Transport, Emergency, TouristSpot
 } = require('../models/ArchiveItem');
 
 // 1. Updated Model Map to match the 14 Reformed categories
@@ -23,7 +23,6 @@ const MODEL_MAP = {
     'transport': Transport,
     'Emergency services': Emergency,
     'social works': SocialWork,
-    'interactive map': InteractiveMap,
 
     // Slug-friendly aliases
     'notable-people': NotablePerson,
@@ -33,8 +32,7 @@ const MODEL_MAP = {
     'heartbreaking-stories': HeartbreakingStory,
     'tourist-spots': TouristSpot,
     'emergency-services': Emergency,
-    'social-works': SocialWork,
-    'interactive-map': InteractiveMap
+    'social-works': SocialWork
 };
 
 // GET: Show the "Add Content" Page
@@ -43,6 +41,24 @@ router.get('/add', ensureStaff, (req, res) => {
         user: req.user,
         pageTitle: 'Contribute to Archive'
     });
+});
+
+// GET: Content Management Page
+router.get('/content-management', ensureStaff, async (req, res) => {
+    try {
+        // Fetch all items submitted by the current user
+        const items = await ArchiveItem.find({ author: req.user._id }).sort({ createdAt: -1 });
+
+        res.render('admin/content-management', {
+            user: req.user,
+            items: items,
+            pageTitle: 'Content Management'
+        });
+    } catch (err) {
+        console.error("Error fetching user content:", err);
+        req.flash('error_msg', 'Could not load your content.');
+        res.redirect('/profile');
+    }
 });
 
 // POST: Save the new Content
@@ -77,7 +93,6 @@ router.post('/add', ensureStaff, async (req, res) => {
             category,
             subType, // This satisfies Institution
             thumbnail,
-            status: 'published',
             author: req.user._id,
             bodyContent: parsedBodyContent,
             ...otherFields
@@ -172,7 +187,6 @@ router.post('/edit/:id', ensureStaff, async (req, res) => {
             category,
             subType, // For Institution
             thumbnail,
-            status: 'published',
             bodyContent: parsedBodyContent,
             ...otherFields
         };

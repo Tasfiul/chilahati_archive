@@ -4,7 +4,7 @@ const mongoose = require('mongoose');
 const contentBlockSchema = new mongoose.Schema({
     type: {
         type: String,
-        enum: ['paragraph', 'heading', 'image', 'list', 'table', 'pdf', 'video', 'quote', 'link'],
+        enum: ['paragraph', 'heading', 'image', 'list', 'pdf', 'video', 'quote', 'link'],
         required: true
     },
     content: mongoose.Schema.Types.Mixed,
@@ -22,11 +22,6 @@ const BaseSchema = new mongoose.Schema({
     title: { type: String, required: true, index: true },
     slug: { type: String, required: true, unique: true },
     thumbnail: { type: String }, // URL (Google Drive/Cloudinary)
-    status: {
-        type: String,
-        enum: ['draft', 'published'],
-        default: 'draft'
-    },
     author: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
     category: { type: String, required: true, index: true }, // Explicitly defined for better builder support
     bodyContent: [contentBlockSchema],
@@ -93,7 +88,6 @@ const HiddenTalent = ArchiveItem.discriminator('hidden talent', new mongoose.Sch
 const Occupation = ArchiveItem.discriminator('occupation', new mongoose.Schema({ ...HeritageFields, ...OccupationFields }));
 const HeartbreakingStory = ArchiveItem.discriminator('Heartbreaking stories', new mongoose.Schema({ ...NarrativeFields }));
 const SocialWork = ArchiveItem.discriminator('social works', new mongoose.Schema({ ...LocationSchema, ...OrgFields }));
-const InteractiveMap = ArchiveItem.discriminator('interactive map', new mongoose.Schema({ ...LocationSchema, markerIcon: String, mapType: String }));
 
 // B. CATEGORIES WITH SUB-CATEGORIES
 const Institution = ArchiveItem.discriminator('institution', new mongoose.Schema({
@@ -133,7 +127,6 @@ module.exports = {
     Occupation,
     HeartbreakingStory,
     SocialWork,
-    InteractiveMap,
     Institution,
     Transport,
     Emergency,

@@ -33,7 +33,6 @@
                     Work</a>
                 <a href="/archive/sopnotory-foundation" class="dropdown-item"><i class="fas fa-lightbulb"></i> Sopnotory
                     Foundation</a>
-                <a href="/map" class="dropdown-item"><i class="fas fa-map-marked-alt"></i> Interactive Map</a>
             </div>
         </div>
 
@@ -64,9 +63,29 @@
                         Content</a>
                     <% } %>
 
-                        <a href="/profile" class="nav-item">Hi, <%= user.username %></a>
-                        <a href="/logout" class="login-btn" style="padding: 0.5rem 1rem; font-size: 0.9rem;">Logout</a>
-                        <% } %>
+                        <% if (user.role==='admin' || user.role==='supervisor' ) { %>
+                            <div class="dropdown">
+                                <a href="#" class="nav-item dropdown-toggle">
+                                    Hi, <%= user.username %> <i class="fas fa-chevron-down"
+                                            style="font-size: 0.8em; margin-left: 5px;"></i>
+                                </a>
+                                <div class="dropdown-menu">
+                                    <a href="/profile" class="dropdown-item"><i class="fas fa-user"></i> Profile</a>
+                                    <a href="/admin/content-management" class="dropdown-item"><i
+                                            class="fas fa-file-alt"></i>
+                                        Content Management</a>
+                                    <% if (user.role==='admin' ) { %>
+                                        <a href="/admin-panel" class="dropdown-item"><i class="fas fa-user-shield"></i>
+                                            Admin Panel</a>
+                                        <% } %>
+                                </div>
+                            </div>
+                            <% } else { %>
+                                <a href="/profile" class="nav-item">Hi, <%= user.username %></a>
+                                <% } %>
+                                    <a href="/logout" class="login-btn"
+                                        style="padding: 0.5rem 1rem; font-size: 0.9rem;">Logout</a>
+                                    <% } %>
     </div>
 </nav>
 
@@ -103,32 +122,45 @@
 <!-- DROPDOWN TOGGLE SCRIPT -->
 <script>
     document.addEventListener("DOMContentLoaded", function () {
-        const categoriesBtn = document.getElementById('categories-btn');
-        const categoriesMenu = document.getElementById('categories-menu');
-        const dropdown = categoriesBtn.closest('.dropdown');
+        const dropdownToggles = document.querySelectorAll('.dropdown-toggle');
 
         // Toggle dropdown on button click
-        categoriesBtn.addEventListener('click', function (e) {
-            e.preventDefault();
-            e.stopPropagation();
-            dropdown.classList.toggle('active');
+        dropdownToggles.forEach(toggle => {
+            toggle.addEventListener('click', function (e) {
+                e.preventDefault();
+                e.stopPropagation();
+
+                // Close other active dropdowns
+                document.querySelectorAll('.dropdown.active').forEach(d => {
+                    if (d !== this.closest('.dropdown')) {
+                        d.classList.remove('active');
+                    }
+                });
+
+                const dropdown = this.closest('.dropdown');
+                dropdown.classList.toggle('active');
+            });
         });
 
-        // Close dropdown when clicking outside
+        // Close all dropdowns when clicking outside
         document.addEventListener('click', function (e) {
-            if (!dropdown.contains(e.target)) {
-                dropdown.classList.remove('active');
+            if (!e.target.closest('.dropdown')) {
+                document.querySelectorAll('.dropdown.active').forEach(d => {
+                    d.classList.remove('active');
+                });
             }
         });
 
         // Prevent dropdown from closing when clicking inside the menu
-        categoriesMenu.addEventListener('click', function (e) {
-            // Allow navigation to links, but stop propagation to prevent closing
-            if (e.target.classList.contains('dropdown-item') || e.target.closest('.dropdown-item')) {
-                // Let the link navigate normally
-                return;
-            }
-            e.stopPropagation();
+        document.querySelectorAll('.dropdown-menu').forEach(menu => {
+            menu.addEventListener('click', function (e) {
+                // Allow navigation to links, but stop propagation to prevent closing
+                if (e.target.classList.contains('dropdown-item') || e.target.closest('.dropdown-item')) {
+                    // Let the link navigate normally
+                    return;
+                }
+                e.stopPropagation();
+            });
         });
     });
 </script>

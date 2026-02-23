@@ -4,7 +4,7 @@ const models = require('../models/ArchiveItem');
 const {
     ArchiveItem, History, Culture, NotablePerson, FreedomFighter,
     MeritoriousStudent, HiddenTalent, Occupation, HeartbreakingStory,
-    SocialWork, InteractiveMap, Institution, Transport, Emergency, TouristSpot
+    SocialWork, Institution, Transport, Emergency, TouristSpot
 } = require('../models/ArchiveItem');
 
 // LEVEL 2: Show Sub-Categories (user clicked a main category)
@@ -57,7 +57,7 @@ router.get('/:category', async (req, res) => {
         // 4. DECISION: LIST OR SUB-MENU?
         if (!foundField || subTypes.length === 0) {
             const queryCategory = category.replace(/-/g, ' ');
-            const items = await ArchiveItem.find({ category: new RegExp('^' + queryCategory + '$', 'i'), status: 'published' });
+            const items = await ArchiveItem.find({ category: new RegExp('^' + queryCategory + '$', 'i') });
             return res.render('archive/list', { items, title: queryCategory, category: queryCategory });
         }
 
@@ -85,7 +85,6 @@ router.get('/:category/:subType', async (req, res) => {
 
         const query = {
             category: new RegExp('^' + queryCategory + '$', 'i'),
-            status: 'published',
             $or: orClauses
         };
 

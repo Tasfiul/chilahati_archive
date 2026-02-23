@@ -77,7 +77,6 @@
                                 <option value="transport" <%=item.category==='transport' ? 'selected' : '' %>>Transport</option>
                                 <option value="Emergency services" <%=item.category==='Emergency services' ? 'selected' : '' %>>Emergency Services</option>
                                 <option value="social works" <%=item.category==='social works' ? 'selected' : '' %>>Social Works</option>
-                                <option value="interactive map" <%=item.category==='interactive map' ? 'selected' : '' %>>Interactive Map</option>
                             </select>
                         </div>
 
@@ -250,7 +249,7 @@
                 }
 
                 // Conditional Detail Visibility
-                if (['institution', 'tourist spots', 'transport', 'Emergency services', 'social works', 'interactive map'].includes(cat) || subTypeMap[cat]) {
+                if (['institution', 'tourist spots', 'transport', 'Emergency services', 'social works'].includes(cat) || subTypeMap[cat]) {
                     document.getElementById('locationGroup').classList.remove('hidden');
                 }
                 if (cat === 'institution') document.getElementById('InstitutionExtra').classList.remove('hidden');

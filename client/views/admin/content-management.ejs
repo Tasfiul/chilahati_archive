@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Content Management - Chilahati Archive</title>
+    <!-- Fonts & Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/admin-add.css">
+    <link rel="stylesheet" href="/css/content-management.css">
+</head>
+
+<body>
+
+    <%- include('../partials/navbar') %>
+
+        <div class="admin-container">
+            <header class="admin-header">
+                <h1><i class="fas fa-file-alt"></i> Content Management</h1>
+                <p>Manage the entries you have contributed to the archive.</p>
+            </header>
+
+            <% if (locals.success_msg && success_msg.length> 0) { %>
+                <div class="alert alert-success">
+                    <%= success_msg %>
+                </div>
+                <% } %>
+                    <% if (locals.error_msg && error_msg.length> 0) { %>
+                        <div class="alert alert-danger">
+                            <%= error_msg %>
+                        </div>
+                        <% } %>
+
+                            <div class="management-list">
+                                <% if (items && items.length> 0) { %>
+                                    <% items.forEach(item=> { %>
+                                        <div class="management-item" id="item-<%= item._id %>">
+                                            <div class="item-info">
+                                                <h3>
+                                                    <%= item.title %>
+                                                </h3>
+                                                <div class="item-meta">
+                                                    <span class="item-category">
+                                                        <%= item.category %>
+                                                    </span>
+                                                    <% if(item.subType) { %>
+                                                        <span><i class="fas fa-tag"></i>
+                                                            <%= item.subType %>
+                                                        </span>
+                                                        <% } %>
+                                                            <span><i class="far fa-calendar-alt"></i>
+                                                                <%= new Date(item.createdAt).toLocaleDateString() %>
+                                                            </span>
+                                                </div>
+                                            </div>
+                                            <div class="item-actions">
+                                                <a href="/entry/<%= item.slug %>" target="_blank"
+                                                    class="action-btn btn-view" title="View Entry">
+                                                    <i class="fas fa-eye"></i> View
+                                                </a>
+                                                <a href="/admin/edit/<%= item._id %>" class="action-btn btn-edit"
+                                                    title="Edit Entry">
+                                                    <i class="fas fa-edit"></i> Edit
+                                                </a>
+                                                <button onclick="deleteItem('<%= item._id %>')"
+                                                    class="action-btn btn-delete" title="Delete Entry">
+                                                    <i class="fas fa-trash-alt"></i> Delete
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <% }) %>
+                                            <% } else { %>
+                                                <div class="empty-state">
+                                                    <i class="far fa-folder-open"></i>
+                                                    <h2>No contents found</h2>
+                                                    <p>You haven't added any entries to the archive yet.</p>
+                                                    <a href="/admin/add" class="action-btn btn-edit"
+                                                        style="margin-top: 1rem;">
+                                                        <i class="fas fa-plus"></i> Add New Entry
+                                                    </a>
+                                                </div>
+                                                <% } %>
+                            </div>
+        </div>
+
+        <!-- Delete Functionality -->
+        <script>
+            function deleteItem(itemId) {
+                if (confirm('Are you sure you want to delete this content? This action cannot be undone.')) {
+                    fetch('/admin/delete/' + itemId, {
+                        method: 'DELETE'
+                    })
+                        .then(res => res.json())
+                        .then(data => {
+                            if (data.success) {
+                                // Remove the item from the DOM with a nice fade out
+                                const itemElement = document.getElementById('item-' + itemId);
+                                if (itemElement) {
+                                    itemElement.style.opacity = '0';
+                                    setTimeout(() => {
+                                        itemElement.remove();
+                                        // Check if list is empty now
+                                        if (document.querySelectorAll('.management-item').length === 0) {
+                                            location.reload(); // Reload to show empty state
+                                        }
+                                    }, 300);
+                                } else {
+                                    location.reload();
+                                }
+                            } else {
+                                alert('Error deleting: ' + (data.error || 'Unknown error'));
+                            }
+                        })
+                        .catch(e => {
+                            console.error('Delete error:', e);
+                            alert('Network error, please try again');
+                        });
+                }
+            }
+        </script>
+</body>
+
+</html>
