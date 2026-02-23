@@ -414,11 +414,6 @@ h1 {
     background: linear-gradient(135deg, #fd79a8, #e84393);
 }
 
-/* Sopnotory Foundation (Premium Brand Look) */
-.card-foundation {
-    background: linear-gradient(135deg, #6a11cb, #2575fc);
-}
-
 .card-map {
     background: linear-gradient(135deg, #0984e3, #74b9ff);
 }
@@ -749,6 +744,7 @@ body.dark-mode {
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(74, 144, 226, 0.3);
 }
+
 .external-link:hover {
     background: #a855f7 !important;
     color: white !important;
