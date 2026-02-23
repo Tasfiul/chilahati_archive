@@ -67,7 +67,13 @@ router.post('/register', async (req, res) => {
         await newUser.save();
 
         // Send Email
-        const verificationLink = `${process.env.BASE_URL}/verify/${token}`;
+        const baseUrl = (process.env.BASE_URL || `http://localhost:${process.env.PORT || 3000}`).replace(/\/+$/, '');
+        const verificationLink = `${baseUrl}/verify/${token}`;
+
+        console.log(`DEBUG: Registration successful for ${email}`);
+        console.log(`DEBUG: Generated Token: ${token}`);
+        console.log(`DEBUG: Verification Link: ${verificationLink}`);
+
         const mailOptions = {
             from: `"Chilahati Archive Admin" <${process.env.EMAIL_USER}>`,
             to: email,
@@ -103,11 +109,16 @@ router.post('/register', async (req, res) => {
 router.get('/verify/:token', async (req, res) => {
     try {
         const token = req.params.token;
+        console.log(`DEBUG: Verification attempt with token: ${token}`);
+
         const user = await User.findOne({ verificationToken: token });
 
         if (!user) {
-            return res.send('<h1>Invalid or Expired Token</h1>');
+            console.log(`DEBUG: No user found for token: ${token}`);
+            return res.send('<h1>Invalid or Expired Token</h1><p>We could not find a user associated with this verification link. It may have expired or already been used.</p>');
         }
+
+        console.log(`DEBUG: User found: ${user.email}. Mark as verified.`);
 
         user.isVerified = true;
         user.verificationToken = undefined;
