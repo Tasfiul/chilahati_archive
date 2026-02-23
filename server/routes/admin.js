@@ -8,6 +8,8 @@ const {
     MeritoriousStudent, HiddenTalent, Occupation, HeartbreakingStory,
     SocialWork, Institution, Transport, Emergency, TouristSpot
 } = require('../models/ArchiveItem');
+const Traffic = require('../models/Traffic');
+
 
 // 1. Updated Model Map to match the 14 Reformed categories
 const MODEL_MAP = {
@@ -55,8 +57,20 @@ router.get('/panel', ensureAdmin, async (req, res) => {
             .limit(5)
             .select('title category createdAt');
 
-        // 2. USER MANAGEMENT DATA
-        // Fetched directly here to keep it in one page as requested
+        // 2. TRAFFIC ANALYTICS DATA
+        // Get last 7 days
+        const trafficData = await Traffic.find()
+            .sort({ date: -1 })
+            .limit(7);
+
+        // Reverse to show chronological order in graph (past to present)
+        const trafficStats = trafficData.reverse();
+
+        // Calculate Today's Totals (using first item of reversed if it matches today)
+        const todayStr = new Date().toISOString().split('T')[0];
+        const todayTraffic = trafficStats.find(t => t.date === todayStr) || { views: 0, uniqueVisits: 0 };
+
+        // 3. USER MANAGEMENT DATA
         const users = await User.find().sort({ createdAt: -1 });
 
         res.render('admin/dashboard/index', {
@@ -65,11 +79,15 @@ router.get('/panel', ensureAdmin, async (req, res) => {
                 totalUsers,
                 totalEntries,
                 categories: categoryCounts,
-                recentEntries
+                recentEntries,
+                traffic: trafficStats,
+                todayViews: todayTraffic.views,
+                todayUniques: todayTraffic.uniqueVisits
             },
             users,
             pageTitle: 'Admin Dashboard'
         });
+
     } catch (err) {
         console.error("Dashboard Error:", err);
         res.status(500).send("Error loading admin dashboard");

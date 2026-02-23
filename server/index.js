@@ -10,11 +10,15 @@ const archiveRoutes = require('./routes/archive');
 const entryRoutes = require('./routes/entry');
 const searchRoutes = require('./routes/search'); // NEW
 const userRoutes = require('./routes/user'); // NEW
+const trafficTracker = require('./middleware/trafficTracker');
 
 // Passport Config
 require('./config/passport')(passport);
 
 const app = express();
+
+// Register Traffic Tracker early (but after express init)
+app.use(trafficTracker);
 
 // 1. Database Connection
 mongoose.connect(process.env.MONGODB_URI)

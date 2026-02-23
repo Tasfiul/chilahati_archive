@@ -9,7 +9,10 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="/css/style.css">
     <link rel="stylesheet" href="/css/admin-dashboard.css">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
+
 
 <body>
     <%- include('../../partials/navbar') %>
@@ -54,15 +57,26 @@
                     <div class="stat-card">
                         <div class="stat-icon"><i class="fas fa-eye"></i></div>
                         <div class="stat-info">
-                            <h3>Traffic (Proxy)</h3>
-                            <div class="value">Coming Soon</div>
+                            <h3>Traffic (Today)</h3>
+                            <div class="value" style="font-size: 1.2rem;">
+                                <%= stats.todayViews %> views / <%= stats.todayUniques %> unique
+                            </div>
                         </div>
+                    </div>
+                </div>
+
+                <!-- TRAFFIC CHART SECTION -->
+                <div class="data-section" style="margin-bottom: 2rem;">
+                    <h3><i class="fas fa-chart-area"></i> Traffic Trends (Last 7 Days)</h3>
+                    <div style="height: 300px; width: 100%; margin-top: 1rem;">
+                        <canvas id="trafficChart"></canvas>
                     </div>
                 </div>
 
                 <div style="display: grid; grid-template-columns: 1fr 1.5fr; gap: 2rem;">
                     <div class="data-section">
                         <h3>Category Breakdown</h3>
+
                         <div class="category-grid" style="grid-template-columns: 1fr; margin-top: 1rem;">
                             <% stats.categories.forEach(cat=> { %>
                                 <div class="cat-item">
@@ -262,7 +276,61 @@
                     alert('Error deleting user');
                 }
             }
+            // --------------------------------------------------
+            // TRAFFIC CHART INITIALIZATION
+            // --------------------------------------------------
+            const trafficData = <%- JSON.stringify(stats.traffic) %>;
+
+            const labels = trafficData.map(d => {
+                const date = new Date(d.date);
+                return date.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+            });
+            const viewCounts = trafficData.map(d => d.views);
+            const uniqueCounts = trafficData.map(d => d.uniqueVisits);
+
+            const ctx = document.getElementById('trafficChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'Page Views',
+                            data: viewCounts,
+                            borderColor: '#10b981',
+                            backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                            fill: true,
+                            tension: 0.4
+                        },
+                        {
+                            label: 'Unique Visits',
+                            data: uniqueCounts,
+                            borderColor: '#6366f1',
+                            backgroundColor: 'rgba(99, 102, 241, 0.1)',
+                            fill: true,
+                            tension: 0.4
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'top' }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: { color: 'rgba(255, 255, 255, 0.05)' }
+                        },
+                        x: {
+                            grid: { display: false }
+                        }
+                    }
+                }
+            });
         </script>
+
 </body>
 
 </html>
